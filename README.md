@@ -8,4 +8,5 @@
 - Practical Statistics for Data Scientists Book
 - Approaching (Almost) any machine learning problem book
 - Fuzzy logic simple notes
+- HuggingFace Library
 
