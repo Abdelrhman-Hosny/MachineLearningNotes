@@ -1,3 +1,5 @@
+[toc]
+
 # <u>**HuggingFace Notes**</u>
 
 # <u>**Chapter 1**</u>
@@ -27,7 +29,7 @@ i.e. `translator = pipeline("translation", model="Helsinki-NLP/opus-mt-fr-en")`
 
 ### Limitations
 
-The pipelines shown are mostly for demonstrative purposes. They can only perform specific tasks and cannot perform variations of them.
+The pipelines shown are mostly for **demonstrative purposes**. They can only perform specific tasks and **cannot perform variations** of them.
 
 ****
 
