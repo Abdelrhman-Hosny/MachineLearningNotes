@@ -347,11 +347,19 @@ This will start fine-tuning the model and report the **training loss**, every 50
 
 ****
 
-####  Evaluation strategy
+####  **<u>Evaluation strategy</u>**
 
 ```python
+from datasets import load_metric
+
 training_args = TrainingArguments("test-trainer", evaluation_strategy="epoch") # tells model to evaluate each epoch
 model = AutoModelForSequenceClassification.from_pretrained(checkpoint, num_labels=2)
+
+def compute_metrics(eval_preds):
+    metric = load_metric("glue", "mrpc")
+    logits , labels = eval_preds
+    predictions = np.argmax(logits, axis=-1)
+    return metric.compute(predictions=predictions, references=labels)
 
 trainer = Trainer(
     model,
