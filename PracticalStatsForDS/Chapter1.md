@@ -229,7 +229,7 @@ This is a topographical map to two variables , each contour band represents a sp
 
 Boxplots and violin plots are used to compare <u>*Numeric data against categorical data*</u> as follows:
 
-<img src="/home/hos/Desktop/66DaysofDS/Practical_Stats/Images/Chapter1/Boxplots_example.png" alt="Boxplots_example" style="zoom:80%;" />
+<img src="./Images/Chapter1/Boxplots_example.png" alt="Boxplots_example" style="zoom:80%;" />
 
 
 
@@ -237,7 +237,7 @@ Boxplots and violin plots are used to compare <u>*Numeric data against categoric
 
 It is similar to boxplot in addition to plotting the density of the data but flipped , but it doesn't show the outliers as clearly
 
-<img src="/home/hos/Desktop/66DaysofDS/Practical_Stats/Images/Chapter1/Violin_Plot.png" alt="Violin_Plot" style="zoom:80%;" />
+<img src="./Images/Chapter1/Violin_Plot.png" alt="Violin_Plot" style="zoom:80%;" />
 
 
 

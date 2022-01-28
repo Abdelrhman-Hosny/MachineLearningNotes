@@ -169,7 +169,7 @@ for i, batch in enumerate(batches,1):
 
 ## <u>The `Trainer` API</u>
 
-![](/home/hos/Studying/MachineLearningNotes/NLP/HuggingFace/Images/Chapter3/trainer-api.png)
+![](./Images/Chapter3/trainer-api.png)
 
 ```python
 from transformers import AutoModelForSequenceClassification

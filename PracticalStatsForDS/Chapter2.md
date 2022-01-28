@@ -182,7 +182,7 @@ N.B.
 
 
 
-![](/home/hos/Desktop/66DaysofDS/Practical_Stats/Images/Chapter2/Gaussian_StdDev.png)
+![](./Images/Chapter2/Gaussian_StdDev.png)
 
 ------
 
