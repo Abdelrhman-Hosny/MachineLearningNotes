@@ -295,9 +295,11 @@ batch = data_collator(samples)
 
 ****
 
-## <u>The `Trainer` API</u>
+## **<u>The `Trainer` API</u>**
 
-![](./Images/Chapter3/trainer-api.png)
+<img src="./Images/Chapter3/trainer-api.png" style="zoom:150%;" />
+
+The `Trainer` API takes the data, hyper-parameters, metrics, collator and tokenizer and connects all of this together to make the training process simpler.
 
 ```python
 from transformers import AutoModelForSequenceClassification
@@ -305,9 +307,12 @@ from transformers import AutoModelForSequenceClassification
 model = AutoModelForSequenceClassification.from_pretrained(checkpoint, num_labels=2)
 ```
 
+Before defining our `Trainer`, we need to define a `TrainingArguments` class that will contain the **hyper-parameters** that will be used in training an evaluation.
+
 ```python
 from transformers import TrainingArguments
 
+# custom training arguments
 training_args = TrainingArguments(
 			'test-trainer',
 			per_device_train_batch_size=16,
@@ -316,7 +321,12 @@ training_args = TrainingArguments(
 			learning_rate=2e-05,
 			weight_decay=0.01,
 )
+
+# default training arguments
+training_args_default = TrainingArguments('test-trainer')
 ```
+
+Now that we have our `TrainingArguments`, We feed that to the `Trainer` along with our data, collator and tokenizer.
 
 ```python
 from transformers import Trainer
@@ -333,7 +343,11 @@ trainer = Trainer(
 trainer.train()
 ```
 
-####  Evaluation Strategy
+This will start fine-tuning the model and report the **training loss**, every 500 steps. But it won't report anything else as we didn't explicitly specify that.
+
+****
+
+####  Evaluation strategy
 
 ```python
 training_args = TrainingArguments("test-trainer", evaluation_strategy="epoch") # tells model to evaluate each epoch
