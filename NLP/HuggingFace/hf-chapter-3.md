@@ -374,3 +374,47 @@ trainer = Trainer(
 
 ****
 
+### **<u>Custom Training</u>**
+
+A model from huggingface can be added into a pipeline that is already made.
+
+```python
+class MyModel(nn.Module):
+	def __init__(self, hf_model, .....):
+		self.transformer = hf_model
+		self.linear1 = ......
+        ....
+    
+    def __forward__(self,x):
+        out = self.transformer(x)
+        out = self.linear(out)
+        ...
+        ..
+        return out
+    
+```
+
+You can also just make a custom training loop as a huggingface transformer is just a pytorch model.
+
+```python
+model = AutoModel.....from_pretrained(checkpoint)
+
+for epoch in range(num_epochs):
+    for batch in tran_dataloader:
+        batch = {k, v.to(device) for k, v in batch.items()}
+        outputs = model(**batch)
+        loss = compute_loss(outputs)
+        loss.backward()
+        optimizer.step()
+        lr_scheduler.step()
+        optimizer.zero_grad()
+        
+```
+
+This can be useful as `Trainer` is a very high level API and you might need to debug something or just add layers to the already existing transformer.
+
+****
+
+### **<u>Accelerate</u>**
+
+I skipped this as I already know pyTorch Lightning which sounds similar to what it does
