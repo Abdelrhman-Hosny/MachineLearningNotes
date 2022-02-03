@@ -484,3 +484,5 @@ We can use what we have done before, the $p-values$.
 
 # **<u>5. Bayesian Statistics</u>**
 
+## **<u>Frequentist vs Bayesian Statistics</u>**
+

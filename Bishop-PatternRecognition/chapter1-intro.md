@@ -86,3 +86,81 @@ $$
 Check the notes from probability course
 
 ****
+
+## **<u>Bayesian Probabilities</u>**
+
+- The probability we reviewed so far was in terms of the **frequencies** of random and **repeatable** events. this is called the **classical** or **frequentist** interpretation of probability.
+
+- What about events that can't be counted ?
+
+  - e.g. the probability that the Arctic ice cap will have disappeared by the end of the century
+    - This event can't be repeated for us to study and get the probability
+
+- Nevertheless, we will generally have **some idea** (e.g. rate of melting of the ice) that can help us determine the probability
+
+  - The **some idea** that we have is a reference to the **prior** information
+    $$
+    P(\theta|data) = \frac{P(data|\theta) P(\theta)}{P(data)}
+    $$
+    $P(\theta)$ is the prior, $P(data|\theta)$ is the likelihood and $P(\theta|data)$ is the posterior.
+
+- Usually, $P(\theta)$ is not the same, through time its value might change and this will result in a change in our prediction too.
+
+  - e.g. Satellites provide us with new data about the rate of melting of ice.
+
+- **Bayesian probability** allows us to **quantify** our **expression of uncertainty** and change that expression based on **new data and observations**.
+
+  - In turn this will lead us to making better decisions
+
+****
+
+### **<u>Example: Polynomial Curve Fitting</u>**
+
+- If we want to fit a curve, it seems reasonable to apply the **frequentist** method. However, we would like to qunatify the **uncertainty** that surrounds the appropriate choice for the **parameters** $\bf w$ or the **choice of model** itself.
+- Recall that, we have previously used **Bayes Theorem** to convert a **prior** probability to a **posterior** probability by **incorporating the evidence obtained by the data**.
+  - We will see later that we can adopt a similar approach when making inferences about quantities such as **parameters** in the polynomial curve fitting.
+
+****
+
+- The effect of the observed data $\mathcal{D} = \{ t_1,....,t_N\}$ is expressed through the conditional probability $P(\mathcal{D}| \bf w)$, this can be represented using Bayes Theorem.
+  $$
+  P(\bf w|\mathcal{D}) = \frac{P(\mathcal{D}|\bf w)P(\bf w)}{P(\mathcal{D})}
+  $$
+  This allows us to evaluate the **uncertainty** in $\bf w$ after we have observed $\mathcal{D}$ in the form of the **posterior probability** $P(\bf w| \mathcal{D})$.
+
+- $P(\mathcal{D}|\bf w)$ is called the **likelihood function**, it expresses how **probable the observed data** set is for different values of the parameter vector $\bf w$.
+
+- Bayes theorem can be rephrased to words as
+  $$
+  \text{posterior} \propto \text{likelihood} \times \text{prior}
+  $$
+  where all the quantities are viewed as **functions of** $\bf w$. we ignore the denominator as it is just a normalizing factor.
+
+- The denominator $P(\mathcal{D})$ can be expressed through the prior and the likelihood function
+  $$
+  P(\mathcal{D}) = \int P(\mathcal{D}|\bf w)p(\bf w) \dd\bf w 
+  $$
+
+- In both the **Bayesian** & **frequentist** paradigms, the likelihood function $P(\mathcal{D}|\bf w)$ plays a **central role**
+
+  - However, the **manner in which it is used** is fundamentally different in the two approaches.
+
+****
+
+### **<u>Likelihood</u>**
+
+- In the frequentist setting, $\bf w$ is considered a **fixed parameter**, whose value is determined by some form of **estimator**.
+  - Error bars on this estimate are obtained by considering the distribution of possible data sets $\mathcal{D}$
+- By contrast, from the bayesian viewpoint there is only a **single dataset** $\mathcal{D}$ (the one being observed)
+  - The uncertainty of the parameters is expressed through a distribution over $\bf w$.
+- A widely used **frequentist estimator** is **maximum likelihood**, in which $\bf w$ is set to the value that maximizes the $P(\mathcal{D}|\bf w)$.
+  - An approach to determining **frequentist error bars** is bootstrapping.
+- One advantage of the **Bayesian viewpoint** is that the **prior information is naturally included**. e.g.
+  - Suppose a coin is tossed 3 times and lands head each time.
+    - A classical maximum likelihood estimate of probability of landing heads would give one (i.e. $P(Heads) = 1$), implying all future tosses will land heads.
+    - However, The Bayesian approach would make use of **prior** and would yield a less extreme result.
+
+****
+
+## **<u>Curve fitting re-visited</u>**
+
