@@ -142,14 +142,13 @@
     S_t^a = H_t
     $$
     
-
   - **Beliefs** of the environment state
-
+  
     You keep a probability distribution of **which state are you probably in**, and you take the decision based on the probability of states.
     $$
     S_t^a = (P[S_t^a=s^1],...,P[S^e_t = s^n])
     $$
-
+  
   - **Recurrent Neural Network**
     $$
     S_t^a = \sigma(s_{t-1}^aW_S+O_tW_o)
@@ -160,7 +159,7 @@
 # **<u>Inside an RL Agent</u>**
 
 - An RL agent may include **one or more** of these components
-  1. **<u>Policy</u>**: agent's **behaviour** function
+  1. **<u>Policy</u>**: agent's **behavior** function
   2. **<u>Value function</u>**: how **good** is each state/action
   3. **<u>Model</u>**: agent's representation of the environment
 
@@ -168,8 +167,141 @@
 
 ### **<u>Policy</u>**
 
+- It maps from **states** to **actions** e.g.
 
+  - Deterministic policy
+    $$
+    a = \pi(s)
+    $$
+
+  - Stochastic policy
+    $$
+    \pi(a|s) = P(A=a|S=s)
+    $$
+    The probability of taking an action based on some state.
 
 ****
 
 ### **<u>Value function</u>**
+
+- Value function is a **prediction** of future reward
+
+- We need the value function to evaluate the **goodness/badness of states**.
+
+  - After the evaluation, we can select between actions
+    $$
+    v_\pi(s) = E_\pi[R_t+\gamma R_{t+1} + \gamma^2 R_{t+2}+....| S_t=s]
+    $$
+    Notice that each **policy** $\pi$ has a special value function.
+
+    The factor of $\gamma$ is less than 1, so if there's a reward $R_t$ and $R_{t+1}$ while $R_t = R_{t+1}$, the reward in the current time step will prioritized.
+
+****
+
+### **<u>Model</u>**
+
+- A model predicts what the **environment** will do next.
+
+- **<u>Transitions</u>**: $\mathcal{P}$ predicts the next state.
+
+- **<u>Rewards</u>**: $\mathcal{R}$ predicts the next (immediate) reward. e.g.
+  $$
+  \mathcal{P}_{ss'} = P[S_{t+1}=s'|S_t=s,A_t=a] \\
+  \mathcal{R}_s^a = E[R_{t+1}|S_t=s,A_t=a]
+  $$
+
+- We are basically trying to predict what our reward and environment will be given states and actions, so we can know which actions lead to the best rewards.
+
+****
+
+## **<u>Example</u>**
+
+- We are going to show how all the previous stuff relate to each other.
+  ![](./Images/v1/maze1.png)
+
+- **<u>Policy</u>**
+
+  ![](./Images/v1/maze-policy.png)
+
+  - The policy maps from the state (position of the agent) to action (direction of movement).
+
+- **<u>Value Function</u>**
+
+  ![](./Images/v1/maze-value-fn.png)
+
+  based on the policy, the value function in this case represents the number of steps away from the goal (i.e. estimate of the future reward (correct estimate in this case))
+
+- **<u>Model</u>**
+
+  ![](./Images/v1/maze-models.png)
+
+****
+
+## **<u>Categorizing RL agents</u>**
+
+1. **<u>Value Based</u>**
+   - No policy (implicit)
+   - Value function
+2. **<u>Policy Based</u>**
+   - Policy
+   - No value function
+3. **<u>Actor Critic</u>**
+   - Policy
+   - Value Function
+
+****
+
+1. **<u>Model Free</u>**
+   - Policy and/or Value function
+   - No model (doesn't try to learn how the environment works)
+2. **<u>Model Based</u>**
+   - Policy and/or Value function
+   - Model
+
+****
+
+# **<u>Problems withing RL</u>**
+
+## **<u>Learning and Planning</u>**
+
+- In sequential decision making, there are two **fundamental problems**
+  1. **<u>Reinforcement Learning</u>**
+     - The environment is initially unknown
+     - The agent interacts with the environment
+     - The agent **improves** its policy
+  2. **<u>Planning</u>**
+     - A model of the environment is **known**
+     - The agent performs computations with its model (w/o external interaction)
+     - The agent improves its policy
+- Example
+  - If you are not told the rules of the game / how the helicopter moves
+    - This is a RL problem
+  - If you are told the rules / maybe given the differential equations for wind interaction with helicopter
+    - This is a planning problem.
+  - An RL problem can be turned into a planning problem after studying the environment.
+
+****
+
+## **<u>Exploitation and Exploration</u>**
+
+- Another problem is the *trade-off* between **exploration** and **exploitation**.
+  - **Exploitation:** when the system makes use of actions that are **known to give a high reward**.
+  - **Exploration:** when the system tries new kind of actions to check **how effective they are** (exploring the environment).
+
+****
+
+## **<u>Prediction and Control</u>**
+
+- **<u>Prediction</u>**: Evaluate the future **given a policy**
+- **<u>Control</u>**: Optimize the future 
+  - i.e. finding the **best policy**
+- **<u>N.B.</u>** we have to solve the prediction problem first to be able to solve the control problem.
+
+****
+
+# **<u>Book Notes</u>**
+
+- **<u>Markov Decision processes</u>** are intended to include **sensation, action and goal** in the **simplest form possible** w/o trivializing any of them.
+- Reinforcement learning unlike supervised and unsupervised focuses on the **whole problem** not just subproblems which is a limitation to supervised and unsupervised approaches.
+- **RL** may involve **supervised learning** for specific reasons that determine which **capabilities are critical and which aren't**.
+
