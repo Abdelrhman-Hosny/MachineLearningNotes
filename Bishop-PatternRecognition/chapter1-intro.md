@@ -243,6 +243,7 @@ Check the notes from probability course
 ### **<u>Bayesian curve fitting</u>**
 
 - Although we have included a prior distribution $p(\bf w|\alpha)$. we are still finding a **point estimate** of $\bf w$ which doesn't amount to the Bayesian treatment.
+  
   - Our aim is to predict a distribution of each $t_n$.
   
 - In a fully Bayesian approach, we should **consistently apply the <u>sum and product rules</u> of probability**. **<u>marginalization</u>** lie at the heart of Bayesian methods for pattern recognition.
@@ -303,7 +304,7 @@ Check the notes from probability course
 
     This is a variant of AIC
 
-  Such criteria tends ti favour overly simple models.
+  Such criteria tends to favor overly simple models.
 
 ****
 
@@ -311,7 +312,7 @@ Check the notes from probability course
 
 1. Real data will often be confined to a region of the space having a **lower effective dimensionality**.
    - In particular, the **direction over which important variations in the target variable** occur may be so confined
-2. Real data typically exhibits some **smoothness property** (atleast locally)
+2. Real data typically exhibits some **smoothness property** (at least locally)
    - .i.e. **small changes ** in input will usually lead to **small changes in the target**
      - This allows us to exploit interpolation like techniques to allow us to make predictions of the target variables for new values of the input.
 
@@ -321,3 +322,142 @@ Check the notes from probability course
 
 # **<u>Decision Theory</u>**
 
+- Decision theory is concerned with **what actions should you take based on our understanding of the value of $t$** (the target variable).
+
+- The **decision step** comes after **inference**, it tells us how to make **optimal decisions** given the **appropriate probabilities**
+
+  - The decision stage is generally very simple, even trivial, once we have solved the inference problem.
+
+- The example is this section is predicting the output variable $t$ which represents the **presence of cancer** from the input $x$ which is an image.
+
+  - There are two classes: $\mathcal{C}_1$ at $t=0$ indicates no cancer & $\mathcal{C}_2$ at $t=1$ indicates cancer.
+
+- In this problem, we are interested in getting the probability $P(\mathcal{C}_k|x)$ which can be expressed as
+  $$
+  P(\mathcal{C}_k|x) = \frac{P(x|\mathcal{C}_k)P(\mathcal{C}_k)}{P(x)}
+  $$
+  Note that any of theses quantities can be obtained from the joint distribution $P(\mathcal{C}_k,x)$ by using marginalization or conditioning w.r.t the appropriate variable.
+
+  - $P(C_k)$ is the prior probability.
+    - In this case $P(C_1)$ represents the probability that a person has cancer **before the X-ray measurement** (allows us to include other effects).
+  - $P(\mathcal{C}_1|x)$ is the **revised probability**  using Bayes' theorem in light of the information contained in the X-ray.
+
+- When classifying the intuitive thing to do would be this
+  $$
+  t = f(x) =  
+  \mathcal{C_1} \ \ if \ \ P(\mathcal{C}_1|x) \geq P(\mathcal{C}_2|x) \\ 
+  \mathcal{C_2} \ \ otherwise
+   \\
+  $$
+  We will show why this intuition is **correct** and also discuss **general criteria for making decisions**
+
+****
+
+## **<u>Minimizing the misclassification rate</u>**
+
+- Our goal is to make as few misclassifications as possible, misclassifications happen when an input $x$ that belongs to $\mathcal{C}_1$ is in region $\mathcal{R}_2$ or vice verse
+
+  - We can then calculate the probability of a mistake by the equation
+    $$
+    P(mistake) = P(x \in \mathcal{R}_1, \mathcal{C}_2) + P(x \in \mathcal{R}_2, \mathcal{C}_1) \\
+    =\int_{\mathcal{R}_1}P({\mathbf{x}}, \mathcal{C}_2) d\mathbf{x}+ \int_{\mathcal{R}_2} P(\mathbf{x},\mathcal{C}_1)  d\mathbf{x}
+    $$
+    We are trying to minimize the $P(mistake)$
+
+    ![](./Images/ch1/optimal-decision-boundary.png)
+
+****
+
+## **<u>Minimizing the expected loss</u>**
+
+- We can use the loss function to make the model penalize some decisions more than others. e.g.
+
+  - In the cancer case, if a patient doesn't have cancer and the model predicted that he does, this will cause some patient distress and will lead to more testing.
+    - However, if the patient actually has cancer and the model predicted that he doesn't, this will probably lead to death.
+  - We can clearly see that one of these options is better than the other.
+
+- This is formalized using the loss function, through the loss function we can tell the model what we just explained above. lets see how
+
+  - The expected loss is stated as
+    $$
+    E[L] = \sum_k\sum_j \int_{\mathcal{R}_j} L_{kj} P(\mathbf{x}, \mathcal{C}_k)d\mathbf{x}
+    $$
+    where $L_{kj}$ is the loss if the element of class $C_k$ is in region $R_j$.
+
+    ![](./Images/ch1/loss-matrix.png)
+
+****
+
+## **<u>The reject option</u>**
+
+- As we noticed, our misclassifications arise from the areas where $P(\mathcal{C}_k|x) \ll 1$ or $P(\mathcal{C}_1|x )\approx P(\mathcal{C}_2|x)$.
+
+- In some applications, it could be appropriate to **avoid making decisions** on the **difficult cases** to obtain a lower error rate on those examples where there is confusion.
+
+  - This is known as the **reject option**.
+
+- In the cancer problem, we could let the model automatically diagnose cases that it is fairly certain of and identify the doctors of only the uncertain ones, they can check those manually to reduce the error.
+
+- We can achieve this by **introducing a threshold** $\theta$.
+
+  - We can then reject all inputs where $P(C_{k_{max}}| x) \lt \theta$.
+
+    ![](./Images/ch1/reject-option.png)
+
+****
+
+## **<u>Inference and decision</u>**
+
+- We broke the classification problem into two separate problems.
+  1. **<u>Inference</u>**
+     - Use the training data to learn a model for $P(\mathcal{C}_k|x)$
+  2. **<u>Decision</u>**
+     - Use the posterior probabilities from stage 1 to make optimal class assignments
+- Another approach would be to **solve both problems together**, simply learn a function that maps inputs $\bf x$ directly into **decisions**, such function is called a **discriminant function**.
+- We have **3 approaches** to solving decision problems.
+
+****
+
+#### **<u>Generative Models</u>**
+
+- First, we solve the **inference** problem of determining the **class conditional densities** $P(x|\mathcal{C}_k)$ for each $\mathcal{C}_k$ individually, also separately infer the prior class probabilities $P(\mathcal{C}_k)$ then use Bayes theorem to find the posterior probability $P(\mathcal{C}_k|x)$.
+
+  - To find $P(\mathcal{C}_k|x)$, we can get the denominator $P(x)$ using
+    $$
+    P(x) = \sum_kP(x|\mathcal{C}_k)P(\mathcal{C}_k)
+    $$
+    which we already have.
+
+- OR we can model the joint distribution $P(\mathcal{C}_k, x)$ directly and obtain the posterior probabilities from it.
+
+- **After**  finding the **posterior probabilities**, we use **decision theory** to determine **class membership** for each input $x$
+
+- Approaches that **model the input and output distributions** are known as **generative models**
+
+  - As by sampling from them, it is possible to **generate** synthetic data points in the input space.
+
+****
+
+#### **<u>Discriminative models</u>**
+
+- We first solve the inference problem of determining the **posterior class probabilities** and then use decision theory to take the decision
+- The approaches that model **posterior probabilities** **<u>directly</u>** are called **discriminative models**
+
+****
+
+#### **<u>Discriminative vs Generative models</u>**
+
+|        | Generative                                                   | Discriminative             |
+| ------ | ------------------------------------------------------------ | -------------------------- |
+| Models | $P(\mathcal{C}_k, x)$ OR $P(x|\mathcal{C}_k), P(\mathcal{C}_k)$ | $P(\mathcal{C}_k|x)$ Onlyy |
+
+****
+
+#### **<u>Discriminant Function</u>**
+
+- We find a function $f(x)$ called a **discriminant function** which maps each **input** $x$ directly to a **class label**.
+- In this case **probabilities play no role**.
+
+****
+
+### **<u>Comparison between approaches</u>**
