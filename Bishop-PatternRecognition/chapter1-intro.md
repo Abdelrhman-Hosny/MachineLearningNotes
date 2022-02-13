@@ -418,7 +418,7 @@ Check the notes from probability course
 
 ****
 
-#### **<u>Generative Models</u>**
+#### **<u>1. Generative Models</u>**
 
 - First, we solve the **inference** problem of determining the **class conditional densities** $P(x|\mathcal{C}_k)$ for each $\mathcal{C}_k$ individually, also separately infer the prior class probabilities $P(\mathcal{C}_k)$ then use Bayes theorem to find the posterior probability $P(\mathcal{C}_k|x)$.
 
@@ -438,7 +438,7 @@ Check the notes from probability course
 
 ****
 
-#### **<u>Discriminative models</u>**
+#### **<u>2. Discriminative models</u>**
 
 - We first solve the inference problem of determining the **posterior class probabilities** and then use decision theory to take the decision
 - The approaches that model **posterior probabilities** **<u>directly</u>** are called **discriminative models**
@@ -453,7 +453,7 @@ Check the notes from probability course
 
 ****
 
-#### **<u>Discriminant Function</u>**
+#### **<u>3. Discriminant Function</u>**
 
 - We find a function $f(x)$ called a **discriminant function** which maps each **input** $x$ directly to a **class label**.
 - In this case **probabilities play no role**.
@@ -461,3 +461,246 @@ Check the notes from probability course
 ****
 
 ### **<u>Comparison between approaches</u>**
+
+- Approach 1 - Generative model - is the **most demanding** as it involves finding the **joint distribution** over both $\bf x$ and $\mathcal{C}_k$
+  - Usually, $\bf x$ will have high dimensionality, therefore may need a large training set to be able to determine the **class conditional densities** $P(\mathbf x|\mathcal{C}_k)$ to a reasonable accuracy.
+  - **N.B.** the class priors $P(\mathcal{C}_k)$ can often be estimated from the fractions of the training points belonging to each class.
+- An advantage of approach 1 is that it allows the marginal density $P(\mathbf x)$ to be estimated using  $P(X) = \sum_k P(\mathcal{C}_k) P(\mathbf x|\mathcal{C}_k)$.
+  - This can be useful for detecting new data points  that have **low probability** from the model's perspective (can detect outliers).
+
+****
+
+- However, if you only wish to make **classification decisions**, approach 1 would be a wasteful of computation resource and demand of data to find $P(\mathbf{x}, \mathcal{C}_k)$,
+
+  - we only need the **posterior probabilities** $P(\mathcal{C}_k|\mathbf x)$ which can be obtained directly from **approach 2** to do classification.
+
+- The class conditional densities $P(x|\mathcal{C}_k)$ contain information that has little effect on the posterior probabilities.
+
+  ![](./Images/ch1/ccp-pp-plot.png)
+
+****
+
+- Approach c is the simplest option, however we no longer have access to the **posterior probabilities** (e.g. KNN)
+
+****
+
+#### **<u>Benefits of having the posterior probabilities</u>**
+
+1. **<u>Minimizing Risk</u>**
+   - If the loss matrix are subject to revision from time to time. If we know the posterior probabilities, we can **trivially** revise the minimum risk detection criterion by modifying the **loss function**.
+   - If we only have a discriminant function, any change to the loss matrix would require that we return to the training data and solve the problem afresh
+2. **<u>Reject Option</u>**
+   
+   - You can only add a reject option if you use the **posterior probability**
+3. **<u>Compensating for class priors</u>**
+   - Consider the problem of detecting the presence of cancer, we could run into the problem of there being very few examples of patients with cancer present and a lot of examples without cancer.
+     - This would probably skew the model and would result in a model that always predicts no cancer and it would have a 99% accuracy.
+   - To solve this problem, we generate an artificial dataset that has equal number of cancer and non cancer patients. this would solve the skewness.
+     - However, we have messed with the data and need to compensate for the effects of the modification.
+       - Specifically, the probabilities $P(\mathcal{C}_k)$ now have wrong values as we messed up the frequency of examples in the dataset
+     - We now take the posterior probability from the **artificially generated dataset** divide by the **class probabilities** from the **same dataset**.
+       - We then multiply that value by the **class probabilities** from the **population dataset**.
+4. **<u>Combining models</u>**
+
+   - If we have multiple sources of information like blood tests, we'll call $X_B$ and X-ray images, we'll call $X_I$.
+
+     - Rather than combining both inputs to a **very large input space**, you could train two different models, one for each input $X_i$.
+
+       As long as the **two models** gives **posterior probabilities for the classes**.
+
+   - A simple way to do this is to assume that, for each class the distribution of $X_I$ and $X_B$ are independent so that
+     $$
+     P(\mathbf{x}_I,\mathbf{x}_B|\mathcal{C}_k) = P(\mathbf{x}_I|\mathcal{C}_k)P(\mathbf{x}_B|\mathcal{C}_k)
+     $$
+
+   - The posterior probability, given both the X-ray and blood data is given by
+     $$
+     P(\mathcal{C}_k|\mathbf{x}_I,\mathbf{x}_B) 
+     \propto
+     P(\mathbf{x}_I,\mathbf{x}_B|\mathcal{C}_k) P(\mathcal{C}_k) \\
+     \ \propto
+     P(\mathbf{x}_I|\mathcal{C}_k) P(\mathbf{x}_B|\mathcal{C}_k)  P(\mathcal{C}_k) \\
+     \propto
+     \frac{P(\mathcal{C}_k|\mathbf{x}_I)P(\mathcal{C}_k|\mathbf{x}_B)}{P(\mathcal{C}_k)}
+     $$
+
+****
+
+## **<u>Loss function for regression</u>**
+
+- In curve fitting, the **average loss** is given by
+  $$
+  E[L]= \int \int L(t, y(\mathbf{x})) p(\mathbf{x},t) d\mathbf{x}dt
+  $$
+  where $L(t,y(\mathbf{x}))$ is the loss function that we choose.
+
+- A common choice of loss function is the **squared error**
+  $$
+  E[L]= \int \int \{t- y(\mathbf{x})\}^2 p(\mathbf{x},t) d\mathbf{x}dt
+  $$
+  The goal is to choose $y(\mathbf{x})$ that **minimizes** $E[L]$. This can be done by using calculus to find $y(\mathbf{x})$
+  $$
+  \frac{\partial E[L]}{\partial y(x)} = 2 \int \{t- y(\mathbf{x})\} p(\mathbf{x},t) dt = 0
+  $$
+
+- Solving for $y(\mathbf{x})$ and using the sum and product rules, we get
+  $$
+  y(\mathbf{x}) = 
+  \frac{\int t \times p(\mathbf{x},t) dt}{p(\mathbf{x})} =
+  \int t \times p(t| \mathbf{x}) dt =
+  E_t[t|\mathbf{x}]
+  $$
+  which is the **conditional average of $t$ condition on $\mathbf{x}$** and is  known as the **<u>regression function</u>**.
+
+  - This would be the **optimal solutions**
+
+- We can derive the loss in a different way
+  $$
+  \{ y(\mathbf{x}) - t \}^2 =
+  \{ y(\mathbf{x}) - E[t|\mathbf{x}] + E[t|\mathbf{x}] - t \}^2
+  $$
+  If we substitute this into the average loss, integrate and then simplify, we get this formula
+  $$
+  E[L] =
+  \int \{y(\mathbf{x})- E[t|\mathbf{x}]\}^2 p(\mathbf{x})\ d\mathbf{x} 
+  \ +\ \{ E[t|\mathbf{x}] - t  \}^2 p(\mathbf{x})\ d\mathbf{x}
+  $$
+  The function that we can change is $y(\mathbf{x})$ which occurs in the **first term only**. It'll be minimized when $y(\mathbf{x}) = E[t|\mathbf{x}]$.
+
+  - This re assures us that $E[t|\mathbf{x}]$ is the **optimal solution**.
+
+  The **second term** doesn't depend on $y(\mathbf{x})$ which means that there's nothing we can do to increase or decrease it, it is known as the **irreducible error**.
+
+  - It is the **variance** of the distribution of $t$, average over $\mathbf{x}$ and represents the **intrinsic variability of the target data** and can be regarded as **<u>noise</u>** as it is **independent of $y(\mathbf{x})$**.
+
+****
+
+- As with the classification problem, we can either **determine the appropriate probabilities** and **then use those to make <u>optimal decisions</u>** or **build models to make the decisions directly**.
+
+- There are 3 distinct approaches to solving the regression problem
+
+  1. Solve the **inference problem** of **determining the joint density** $p(\mathbf{x},t)$ then normalize to find the **conditional density** $p(t|\mathbf{x})$ and finally **marginalize** to find the **conditional mean ** $E[t|\mathbf{x}]$
+  2. Solve the **inference problem** of **determining the conditional density **$p(t|\mathbf{x})$ and then **marginalize** to find the **conditional mean** $E[t|\mathbf{x}]$
+  3. Find the **regression function **$y(\mathbf{x})$ directly from the **training data**.
+
+  The **relative merits** of the 3 approaches are the **same as the classification approaches discussed earlier**.
+
+****
+
+- There are **other choices for loss function** other than the **squared loss**
+
+  - The **squared loss** may even lead to very poor results in some cases
+    - e.g. **multi-modal** distribution $p(t|\mathbf{x})$.
+
+- We then consider a **generalization of the squared loss**, called the **Minkowski loss**
+  $$
+  E[L_q] = \int \int |y(\mathbf{x}) - t|^q p(\mathbf{x},t) \ d\mathbf{x}dt
+  $$
+
+- The minimum value of $E[L_q]$ is given by the **conditional mean** at $q=2$, the **conditional median** for $q=1$ and the **conditional mode** for $q=0$.
+
+- This plot shows the effect for different values of $q$
+
+  ![](./Images/ch1/Minkowski-loss.png)
+
+****
+
+# **<u>Information Theory</u>**
+
+- We begin by considering a random variable $x$ and asking **how much information** is received when we **observe a specific value** for this variable.
+
+  - This can also be viewed as the **degree of surprise**.
+  - A highly improbable event occurring will give us a high amount of information (if a certain event $p(x)=1$ occurred then we receive no information.)
+
+- Therefore, we look for a quantity $h(x)$ that is a **monotonic function** and  **expresses the <u>information</u> content**.
+
+  - If two events $x,y$ are independent, then the information from observing both should be $h(x,y) = h(x) + h(y)$.
+    - Two independent events have the probability of $p(x,y) = p(x)  p(y)$.
+  - From above we can show that $h(x)$ must be a **logarithm of **$p(x)$.
+
+  $$
+  h(x)= - \log_2  p(x)
+  $$
+
+- **N.B.** **low probability** events correspond to **high information** content
+
+- The choice of basis for the logarithm is **arbitrary**.
+
+- The unit for measuring information is **bits**
+
+- The **average amount of information** when transmitting the value of a random variable $x$ is called the **entropy** of the rv $x$.
+  $$
+  H[x] = - \sum_x p(x) \log_2p(x)
+  $$
+
+- **Non uniform** distributions have **smaller entropy** than **uniform ones**.
+
+- **<u>Noiseless coding theorem</u>**
+
+  States that the **entropy** is a **lower bound** on the number of bits needed to **transmit the state of a random variable**.
+
+- **<u>Differential Entropy</u>**
+
+  It is the entropy used for continuous distributions, we qunatize the distribution where size of bin is $\Delta$ $\lim_{\Delta \rightarrow 0}$and compute the entropy
+
+  - As a result continuous distributions usually have higher entropy.
+
+  - Unlike discrete entropy, differential entropy **can take negative values**.
+    $$
+    H[x] = - \int p(x) \ln p(x) dx
+    $$
+    
+
+- If we have a joint distribution $p(x,y)$ from which we draw pairs of values $x,y$. If we already know the value of $x$, the additional information needed to specify the corresponding value of $y$ is $- \ln p(y|x)$.
+
+  - The **conditional entropy of y given x** is
+    $$
+    H[y|x] = - \sum_x \sum_y p(x,y) \log p(y|x)
+    $$
+
+- It can be seen using the product rule that the **conditional entropy** satisfies the relation
+  $$
+  H[x,y] = H[y|x] + H[x]
+  $$
+  
+- 
+
+****
+
+## **<u>Relative entropy and mutual information</u>**
+
+- Consider an unknown distribution $p(x)$, and suppose that we've modeled this distribution using an approximating distribution $q(x)$.
+
+  - If we use $q(x)$ to construct a **coding scheme** for the purpose of **transmitting the values of $x$ to a receiver**, then the **average <u>additional</u>** amount of informations (in nats) is given by
+    $$
+    KL(p||q) = - \int p(x) \ln \frac{q(x)}{p(x)} dx
+    $$
+    This is known as the **relative entropy** or **Kullback-Leibler divergence**, or **KL divergence** between the distributions $p(x)$ and $q(x)$.
+
+  - **N.B.** KL divergence is **not a symmetrical quantity** i.e. $KL(p||q) \neq KL(q||p)$
+
+- $KL(p||q) = 0$ iff $p(x) = q(x)$, also $KL(p||q) \geq 0$.
+
+- Kullback-Leibler divergence can be interpreted as a **measure of dissimilarity** of the two distributions $p(x)$ and $q(x)$
+
+- We can use this to determine how **close** a distribution is to being independent
+  $$
+  I[x,y]= KL(p(x,y)||p(x)p(y))\\
+  =-\int \int p(x,y) \ln \frac{p(x)p(y)}{p(x,y)}\ dxdy
+  $$
+  This is called the **mutual information** between the variables $x$ and $y$.
+
+  This is equal zero only if $x$ and $y$ are **independent**.
+
+- Using sum and product rules of probability, we see that mutual information is related to the **conditional entropy** through
+  $$
+  I[x,y] = H[x] - H[x|y] = H[y] - H[y|x]
+  $$
+
+- We can view the **mutual information** as the **reduction in the uncertainty about $x$ after being told the value of $y$ **
+
+- From a Bayesian perspective, we can view $p(x)$ as the **prior distribution** for $x$, and $p(x|y)$ as the **posterior distribution after we have observed the new data $y$** .
+
+  - The mutual information represents the **reduction in uncertainty about $x$ as a consequence of the new observation $y$**.
+
+****
