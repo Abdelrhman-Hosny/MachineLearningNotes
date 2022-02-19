@@ -426,3 +426,204 @@ First we get the dataset
 ****
 
 ### **<u>Question Answering</u>**
+
+- Will be seen in the NLP Book by hugging face.
+
+****
+
+# **<u>Normalization & Pre-tokenization</u>**
+
+## **<u>Normalization</u>**
+
+- The normalization steps involves **general cleanup** such as **removing needless whitespace, lowercasing or removing accents**.
+
+  - They may also apply **Unicode normalization**
+
+- each Transformers `toeknizer` has an attribute called `backend_tokenizer` that allows you to access the underlying tokenizer
+
+  ```python
+  from transforemrs import AutoTokenizer
+  
+  tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
+  print(type(tokenizer.backend_tokenizer)) # <class 'tokenizers.Tokenizer'>
+  
+  print(tokenizer.backend_tokenizer.normalizer.normalize_str("Héllò hôw are ü?"))
+  ```
+
+  ```python
+  'hello how are u?'
+  ```
+
+- Different tokenizers will normalize text in different ways
+
+****
+
+## **<u>Pre-tokenization</u>**
+
+- We can't train our tokenizer on raw text, we first need to **split the text into small entities** like **words**.
+
+  - This is what happens in the **pre-tokenization step**.
+
+- a **word-based** tokenizer can simply split a raw text on **whitespace** and **punctuation**.
+
+  ```python
+  tokenizer.backend_tokenizer.pre_tokenizer.pre_tokenize_str('Hello, how are  you?')
+  ```
+
+  ```python
+  [('Hello', (0, 5)), (',', (5, 6)), ('how', (7, 10)), ('are', (11, 14)), ('you', (16, 19)), ('?', (19, 20))]
+  ```
+
+  **N.B.** The tokenizer is already keeping track of the **offsets**. the tokenizers ignores the two spaces and replaces them with just one, However, it keeps track of that in the **offsets**.
+
+- The tokenizer above was the BERT tokenizer, here are other examples for different tokenizers
+
+  - `gpt2`
+
+    ```python
+    tokenizer = AutoTokenizer('gpt2')
+    tokenizer.backend_tokenizer.pre_tokenizer.pre_tokenize_str('Hello, how are  you?')
+    ```
+
+    It splits on whitespace and punctuation as well, but it keeps the spaces and replace them with a `Ġ` symbol, this enables us to **recover the original space if we decode the tokens**
+
+    ```python
+    [('Hello', (0, 5)), (',', (5, 6)), ('Ġhow', (6, 10)), ('Ġare', (10, 14)), ('Ġ', (14, 15)), ('Ġyou', (15, 19)),
+     ('?', (19, 20))]
+    ```
+
+  - `t5-small`
+
+    ```python
+    tokenizer = AutoTokenizer.from_pretrained("t5-small")
+    tokenizer.backend_tokenizer.pre_tokenizer.pre_tokenize_str("Hello, how are  you?")
+    ```
+
+    this tokenizer splits on **whitespace only** (doesn't split on punctuation like `gpt2` and `BERT`).
+
+    Also note that, it added a space by default(before `Hello`) and ignored the double space between `are` and `you`
+
+    ```python
+    [('▁Hello,', (0, 6)), ('▁how', (7, 10)), ('▁are', (11, 14)), ('▁you?', (16, 20))]
+    ```
+
+****
+
+## **<u>SentencePiece</u>**
+
+- SentencePiece is a **tokenization algorithm**, it can be used with Byte-pair encoding, WordPiece or Unigram models.
+- It considers the text as a **sequence of Unicode characters**, and replace spaces with the `_` character.
+- It **doesn't require a <u>pre-tokenization step</u>** which is **useful** for **languages** that **don't have spaces** (like Chinese or Japanese) 
+- The **main feature** of SentencePiece is **reversible tokenization**. since there is no special treatment of spaces, **decoding** is done by **concatenating** then **replacing `_` with spaces** 
+  - Unlike `BERT` tokenizer which **removes repeating spaces**, therefore has **non reversible tokenization**.
+
+****
+
+## **<u>Byte Pair Encoding tokenization</u>**
+
+- To create the vocabulary, we first start from all the letters in our corpus.
+
+  ```python
+  corpus = "i am enrolled in the hugging face course"
+  ```
+
+  the initial vocabulary is the single characters that would allow us to write out corpus again.
+
+  ```python
+  ['i', 'a', 'm', 'e', 'n', 'r', 'o', 'l', 'd', 't', 'h', 'u', 'g', 'f', 'c', 's']
+  ```
+
+- ![](./Images/Chapter6/BPE-freq-1.png)
+
+  We then check the frequency of pairs that are next to each other (in the initial corpus), then we add the pair of the **highest frequency** and repeat again
+
+- We keep repeating until we get the desired # of words in the tokenizer (given as a parameter for tokenizer training).
+
+- If we want to tokenize the word `'hugs'`
+
+  ![](./Images/Chapter6/BPE-matching-1.png)
+
+  First, we split hugs into just character `'hugs' -> ['h', 'u', 'g', 's']`
+
+  Then we iterate over the merges, and try to find two tokens that we can merge.
+
+  - In this case, we found `h` + `u` = `hu`, so we replaced them with `hu` and we iterate again
+    - We will find `hu` + `g` = `hug`, so we replace it
+
+****
+
+## **<u>WordPiece Tokenization</u>**
+
+- Similar to BPE, you start with the initial vocabulary consisting of the letters that compose the corpus, but there's a small subtlety
+
+  ![](./Images/Chapter6/WP-freq-1.png)
+
+  If a letter is not at the start of a sentence, we add `##` before the letter.
+
+- we then compute a score, for each pair in our vocab
+
+  - The score equation is
+    $$
+    \text{score} = \frac{\text{freq of pair}}{\text{freq of 1st element} \times \text{freq of 2nd element}}
+    $$
+
+  ![](./Images/Chapter6/WP-score-1.png)
+
+- We then pick the pair with the **highest score**, and merge them so `h` & `##u` will be added as `hu` and then we repeat until we reach the desired size of our vocabulary.
+
+- To split a word into tokens, we do the following
+
+  ![](./Images/Chapter6/WP-matching.png)
+
+  We search in order from left to right until we find the **longest matching** word in the sentence and the vocabulary.
+
+  then we repeat for new words.
+
+****
+
+## **<u>Unigram Tokenization</u>**
+
+- Unigram's strategy is to start with a large vocabulary and keep removing words until you reach the desired limit
+
+  - The word/token to remove is picked based on a loss function based on the Unigram language model
+
+- **<u>Unigram Model</u>**
+
+  Unigram is a **statistical language model** that assigns probabilities for each word and assumes all words are independent.
+
+  ![](./Images/Chapter6/unigram-model.png)
+
+- The initial vocabulary for Unigram is to list all the **substrings** for **each word** in the corpus
+
+  ![](./Images/Chapter6/unigram-corpus.png)
+
+- The model uses an **expectation-maximization approach**.
+
+- The loss is expressed as follows for a corpus $C$ and vocabulary $V$
+  $$
+  L(V,C) = \sum_i \text{freq}_i \times -\log P(w_i)
+  $$
+
+- First, we get the probability of each token using counting $P(\text{token}) = \frac{\text{freq of token}}{\text{total frequency of all tokens}}$
+
+  - For each word, we find all the possible representations using the current vocabulary and compute the probability for each representation.
+
+  - We then pick the representation with the **highest probability**
+
+    ![](./Images/Chapter6/unigram-calc.png)
+
+- We then calculate the loss over the whole corpus
+
+  ![](./Images/Chapter6/unigram-corpus-loss.png)
+
+  We take each word in the corpus and get the calculated probability, and use that to calculate the loss.
+
+  We then remove the token/s that **impact** the loss the **least**.
+
+- Then repeat the process until you reach the desired vocabulary size.
+
+****
+
+- **N.B.** we don't have to remove only 1 token per iteration
+
+****
