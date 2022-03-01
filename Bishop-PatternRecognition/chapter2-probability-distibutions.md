@@ -275,3 +275,28 @@
 ****
 
 # **<u>The Gaussian Distribution</u>**
+
+- In case of a single variable $x$, the Gaussian can be expressed as
+  $$
+  \mathcal{N}(x|\mu,\sigma^2) = \frac{1}{(2\pi\sigma^2)^\frac{1}2} \exp\{ -\frac{1}{2\sigma^2} (x - \mu)^2\}
+  $$
+  for a $D$-dimensional vector $\mathbf{x}$, the **multivariate** Gaussian is expressed by
+  $$
+  \mathcal{N}(\mathbf{x|\mu, \Sigma}) = \frac{1}{(2\pi)^\frac{D}2}\frac{1}{|\Sigma|^\frac{1}2} \exp(-\frac{1}2(x-\mu)^T\Sigma^{-1}(x-\mu))
+  $$
+
+- The variable that **maximizes** the **entropy** is a Gaussian (applies for both uni and multivariate)
+
+- The Gaussian is also important due to the **central limit theorem**, it tells us that the **sample means of <u>nearly</u> all distributions is a Gaussian**.
+
+  - If we take a binomial distribution, sample it and calculate the sample mean.
+
+    That sample mean will be a random variable that is a **normal distribution**.
+
+  - In practice, the **convergence to a Gaussian** as $N$ increases is **very rapid**.
+
+****
+
+Couldn't really understand the rest of this stuff, so I've moved on to later chapters and will return later if needed.
+
+****
