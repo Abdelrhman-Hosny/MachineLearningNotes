@@ -154,3 +154,27 @@ The analysis applied in this chapter is usually **independent** of the **choice 
 ****
 
 ## **<u>Geometry of least squares</u>**
+
+![](./Images/ch3/geometry-least-squares.png)
+
+- We consider an $N$-dimensional space.
+- $\mathbf t$ & $\phi_j(\mathbf x_n)$ are vectors in the space.
+  - Note that $\phi_j(\mathbf x_n)$ is an $N$-dimensional vector (column in the input matrix)
+- If the # of basis functions $M$ is **smaller** than the # of data points.
+  - The $M$ vectors $\phi_j(\mathbf x_n)$ will span a **linear subspace $\mathcal{S}$** of dimensionality $M$.
+- We define $\mathbf y = [y(\mathbf{x_0,w}),..,y(\mathbf{x_n,w})] $ to be an $N$-dimensional vector.
+- Since $\mathbf y$ is a **linear combination** of $\phi_j(\mathbf x_n)$, it can exist anywhere on the $M-$dimensional subspace $\mathcal{S}$.
+- Thus, the least squares error can be described as the **squared Euclidean distance** between $\mathbf y$ and $\mathbf t$.
+- The **least-square solution for $\mathbf w$** corresponds to the choice of $\mathbf y$ that lies in the subspace $\mathcal{S}$ and that is closest to $\mathbf t$.
+  - The solution also corresponds to the **projection** of $\mathbf t$ onto the **subspace** $\mathcal{S}$.
+
+****
+
+## **<u>Sequential Learning</u>**
+
+- Sequential learning is applying techniques like **stochastic gradient descent** aka **sequential gradient descent**.
+
+****
+
+## **<u>Regularized least squares</u>**
+
