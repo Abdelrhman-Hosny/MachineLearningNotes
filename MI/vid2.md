@@ -8,7 +8,7 @@
 
   - Reflex agents **can be **rational.
 
-- **<u>Planning agents</u>**
+- **<u>Planning agents</u>** (not in uni lecture slides)
 
   Asks **what if**. Decisions are based on a **hypothesized consequences of actions**.
 
@@ -32,3 +32,14 @@
 - To solve a search problem, you have to **model** it correctly.
 
 ****
+
+## **<u>Abstraction</u>**
+
+- Means that we **remove the details**.
+  - e.g. If we take the road x, we don't care what radio channel was playing
+  - This makes modeling problems easier
+
+****
+
+## **<u>State Space Graphs and Search Trees</u>**
+
