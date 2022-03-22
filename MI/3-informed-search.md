@@ -79,3 +79,45 @@
 #### **<u>Proof of A\* Optimality with an admissable heuristic</u>**
 
 ****
+#### **<u>Creating Optimal Heuristics</u>**
+A good way to create heuristic functions is to try to solve a **simplified version of the problem**.
+
+You'll find that there's a trade off.
+
+- An **accurate** heuristic function takes more time to compute, but makes you explore **less nodes**
+- As the accuracy gets lower, you will explore more nodes but the cost of each node is lower than it would be with the more accurate heuristic.
+
+You can create two heuristics $h_1$ and $h_2$ and make the final heuristic be $max(h_1(x),h_2(x))$.
+
+- This takes more computation but might lead to a higher accuracy.
+
+****
+## **<u>Graph Search</u>**
+
+- **Graph Search** performs the same as Tree search but with 1 major difference
+  - Graph search doesn't visit the same node twice
+    - It does so by keeping a **set** of visited nodes and not revisiting any node that's already in the set
+
+- Graph search is still **complete**
+  - We only exclude parts of the tree that we **already visited**.
+
+- However, Graph Search is **not always optimal**.
+  - In A* search, we need the **heuristic function** to be **consisent** in case of graph search
+
+### **<u>Heuristic Consitency</u>**
+
+- A heuristic if consistent if
+  - $$h(A) - h(C) \leq cost(A,C)$$ 
+![alt](./images/v3/heuristic-consisntency.png)
+
+If $h(A) = 4$, $h(C) = 1$ and $cost(A,C) = 2$, we find that $h(A) - h(C) \nleq cost(A,C)$ which means function is **not consistent**.
+However, if we change $h(A) = 2$ then we find that $h(A) - h(C) \leq cost(A,C)$ which means function is **consistent**.
+
+#### **<u>Consequences of consistency</u>**
+- The value of $f$ along a path **never decreases**.
+- We know that $h(A) \leq cost(A,C) + h(C)$
+  This means that
+  $$f(A) = g(A) + h(A) \leq g(A) + cost(A,C) + h(C) = f(C)$$
+
+# **<u>Notes</u>**
+I didn't include the proof of optimality in Tree Search or Graph search, feel free to watch it from the [video](https://www.youtube.com/watch?v=Mlwrx7hbKPs&list=PLsOUugYMBBJENfZ3XAToMsg44W7LeUVhF&index=3) if needed.
