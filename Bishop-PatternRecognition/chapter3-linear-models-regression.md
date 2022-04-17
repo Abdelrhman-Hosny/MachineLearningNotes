@@ -178,3 +178,20 @@ The analysis applied in this chapter is usually **independent** of the **choice 
 
 ## **<u>Regularized least squares</u>**
 
+- We had previously introduced the **regularization term** that controls the **relative importance** of the **data-dependent error** $E_D(\mathbf w)$ and the **regularization term** $E_W(\mathbf w)$.
+  - $$
+  E_D(\mathbf w) + \lambda E_W(\mathbf w)
+    $$
+- One of the simplest form of regularizers is given by the **sum of squares of the weights**
+  $$E_W(\mathbf w) = \frac{1}{2} \mathbf w^T\mathbf w$$
+- The total error function then becomes
+  $$\frac{1}{2}\sum_{n=1}^N \{t_n - \mathbf{w^T}\phi(\mathbf x_n)\}^2 + \frac{\lambda}2 \mathbf w^T \mathbf w$$
+
+- This **particular choice of regularizer** - sum of the squares of the weights - is known in the ML literature as **weight decay**, because in sequential learning algorithms, it **encourages weight values to decay towards zero, <u>unless supported by the data</u>**.
+  - In statistics, it provides an example of **parameter shrinkage** method as it shrinks the **parameter values towards zero**.
+  - It also has the advantage that the error function remains quadratic, so it can be solved in closed form as before.
+    $$\mathbf w = (\lambda I + \Phi^T\Phi)^{-1} \Phi^T \mathbf t$$
+- A more general regularizer is sometimes used
+  $$\frac{1}{2}\sum_{n=1}^N \{t_n - \mathbf{w^T}\phi(\mathbf x_n)\}^2 + \frac{\lambda}2  \sum^M_{j=1}|w_j|^q$$
+  - In the case of $q=2$, this is the **quadratic regularizer** which was discussed above
+  - In the case of $q=1$, the regularizer is known as the **lasso**, it has the property that if $\lambda$ is sufficiently large, some of the cofficients $w_j$ will be zero, leading to a **sparse model**.

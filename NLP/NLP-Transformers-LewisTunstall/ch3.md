@@ -94,3 +94,80 @@ Here's the link to the original paper: [Attention is all you need](https://arxiv
 ### **<u>Relative positional representations</u>**
 
 - 
+****
+## **<u>Adding a Classification Head</u>**
+- Transformer models are usually divided into a **task-independent body** and a **task-specific head**.
+
+- The way **huggingface** does it is as so
+  ```python
+  class TransformerForSequenceClassification(nn.Module):
+    def __init__(self, config):
+      super().__init__()
+      self.encoder = TransformerEncoder(config)
+      self.dropout = nn.Dropout(config.hidden_dropout_prob)
+      self.classifier = nn.Linear(config.hidden_size, config.num_labels)
+    
+    def forward(self, x):
+      x = self.encoder(x)[:, 0, :] # select a certain hidden state from the sentence
+      x = self.dropout(x)
+      x = self.classifier(x)
+      return x
+  ```
+****
+
+# **<u>The Decoder</u>**
+
+****
+
+# **<u>The Transformer Tree of Life</u>**
+
+- The figure below shows a **few** of the most prominent models and their descendants
+  ![alt](./images/ch3/transformer-examples.png)
+
+## **<u>The Encoder Branch</u>**
+
+- The **first** encoder only models based on the Transformer architecture was **BERT**, at the time, it outperformed all the SOTA models ib the GLUE benchmark, which **measures NLU** across several tasks of varying difficulties.
+
+****
+### **<u>BERT</u>**
+
+- BERT was pretrained with **two objectives**
+  1. **Masked Language Modeling** (MLM)
+       - Predicting masked tokens in text
+  2. **Next Sentence Prediction** (NSP)
+       - Determine if one text passage is **likely to follow** another
+
+****
+### **<u>DistilBERT</u>**
+
+- BERT delivered great results but had a **problem**, it was **large** and **slow** for certain environments
+- **Knowledge Distillation** technique was used during **pretraining**, and it resulted in **DistilBERT**.
+- DistilBERT achieves **97%** of BERT's performance while using **40%** less **memory** and being **60% faster**.
+
+****
+
+### **<u>RoBERTa</u>**
+
+- A study fllowing the release of BERT revealed that **performance** can be **improved** by **modifying the pretraining scheme**.
+- RoBERTa is **trained longer**, on **larger batches w/ more training data**, it also **drops the NSP task**.
+- These changes improved the performance significantly **compared to the original BERT model**.
+
+****
+
+### **<u>XLM</u>** (Cross-lingual Language Model)
+
+****
+### **<u>XLM-RoBERTa</u>**
+
+****
+### **<u>ALBERT</u>**
+
+- The **ALBERT** model introduced **three changes** to make the encoder more efficient
+  1. **Decouples**  the **token embedding dimension** from the **hidden dimension**.
+     - Allows the **embedding dimension** to be small and thereby **saving parameters**. (especially when the vocabulary is large)
+  2. All layers **share the same parameters**
+     - This further **decreases** the number of effective parameters. (still don't quite understand this tbh : ) )
+
+  3. NSP objective is **replaced** with **sentence-ordering prediction**.
+     - Predict **whether or not** the **order**  of **two** sentences was **swapped**. (instead of if they belong together at all)
+- These changes made it possible to **train even larger models w/ fewer parameters** and reach a good performance.
