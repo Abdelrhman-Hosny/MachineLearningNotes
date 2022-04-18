@@ -236,7 +236,27 @@ The revise function is $O(d^2)$ and the AC3 function is $O(cd)$.
 ### <u>**Arc Consistency Limitations**</u>
 
 - After enforcing arc consistency, we can have one solution or multiple solutions.
+
 - The problem is that we can have **no solutions** (and not know it).
+
+  ![](./images/v4/lim-arc-consistency.png)
+
+  Here as arc consistency won't know that this is an error, (will know in the next stage after assigning any of them).
+
+****
+
+## **<u>K-Consistency</u>**
+
+- This is an improved version of arc consistency (k-consistency), means that you make each k arcs consistent with each other
+  - This is more expensive but can solve problems like the picture above which detects the error using 3-consistency
+- Higher K is more expensive to compute (number of combinations increase).
+- 1- consistent means enforcing unary constraints
+- 2- consistent means using arc consistency just as we discussed
+
+### **<u>Strong k-consistency</u>**
+
+- If the graph is strong k-consistent that also means that it is strong k-1, k-2 ... 2-consistent, 1-consistent
+- **Claim:** Having an n-consistent graph, we can solve it without backtracking.
 
 ****
 
@@ -262,4 +282,161 @@ The revise function is $O(d^2)$ and the AC3 function is $O(cd)$.
 - We pick the value that rules out the **fewest values** in the **remaining variables**.
 - In MRV, we picked the most restrictive move as we had to go through all the **variables** anyway
 - In LCV, we pick the least restrictive move as we don't have to go through all the **values**.
+
+****
+
+# **<u>Problem Structure</u>**
+
+- We can exploit the structure of the constraint graph, to make solving our problem quicker.
+
+## **<u>Independent Subproblems</u>**
+
+- In the map coloring problem, there is a node that has no constraints (no connected components).
+
+  ![](./images/v4/independent-subp.png)
+
+- Here the node $T$ is not connected to any constraints, which means it can be solved on its own as a subproblem.
+
+- Before solving the graph, we can search for **connected components** and solve each of them separately.
+
+- If we have a graph of $n$ variables that can be broken into subproblems of $c$ variables, $d$ is the number of vars in each domain.
+  $$
+  \text{Worst case sol is } O(\frac{n}c d^c) \text{ linear in n} \\
+  \text{e.g. : } n = 80, d=2, c=20 \\
+  2^{40} = 4\times10^9 \text{ years}\\
+  4* 2^{20} = 0.4 \text{ seconds}
+  $$
+
+****
+
+## **<u>Tree-Structured CSPs</u>**
+
+- If you find that your constraint graph has **no loops**, the CSP can be solved in $O(nd^2)$ time. (linear in number of variables)
+
+  - Compared to general CSPs, which are solved in $O(d^n)$ time
+
+    ![](./images/v4/tree-struct-csp.png)
+
+### **<u>Algorithm for tree-structured-csp</u>**
+
+- Order the graph by choosing a **random** node to be the root variable, and perform topological sorting on the graph.
+
+  - There can be multiple ways to order the graph, just pick one.
+
+    ![](./images/v4/dag-order.png)
+
+    **<u>Algorithm</u>**
+
+    1. Start at the last node which is F `for i = n: 2`, remove inconsistency from the parent
+       - We start by removing inconsistency for the arc `Parent(F) -> F`, then `Parent(E) -> E`.
+    2. Assign forward `for i = 1 : n`, assign the node consistently with `Parent(node)`.
+
+  - Runtime is $O(nd^2)$.
+
+- **Claim 1**: After backward pass, all root-to-leaf arcs are **consistent**
+
+  - **Proof**: Each $X \rightarrow Y$ was made consistent at one point, and $Y$'s domain couldn't have been reduced thereafter.
+  - i.e. ($X \rightarrow Y$ is consistent) We only remove elements from the parents (Y stays the same) as we enforce consistency from right to left, so $Y$ will not be the tail therefore no elements from $Y$ will be deleted.
+  - We can only delete elements from $X$ which doesn't break consistency.
+    - If $X \rightarrow Y$, then $S \rightarrow Y$ if $S \subseteq X$.
+
+- **<u>Claim 2</u>**: If root-to-leaf arcs are consistent, forward assignment will **not backtrack**.
+
+  - Since each arc is consistent, then there won't be any backtracking as **each node has 1 parent only** (from tree structure).
+  - If you have one parent and you are arc consistent with them, you know that there's at least 1 value in that parent that doesn't break the constraints.
+
+****
+
+## **<u>Improving Structure</u>**
+
+- Usually, you won't have a tree substructure, but it'll be tree-ish.
+  - This means that with some small moves, you can convert this structure into a tree structure.
+
+****
+
+### **<u>Nearly Tree-Structured CSPs</u>**
+
+- In trees that are nearly tree structured, we **delete nodes** until they are tree structured (howw?)
+
+  ![](./images/v4/nearly-tree-struct.png)
+
+  - "deleting nodes" means that, you take a node SA in this case, and **instantiate** it to **all** it's **possible values** and for each of them, perform forward checking/arc consistency (depending on what you use).
+  - The remaining graph is a subproblem that is tree structured as seen on the right.
+  - Cutset size c gives runtime $O((d^c)(n-c)d^2)$ for very small $c$.
+
+****
+
+### **<u>Cutset Condition Algorithm</u>**
+
+![](./images/v4/cutset.png)
+
+****
+
+### **<u>Tree Decomposition</u>**
+
+- Create a tree structured graph of **mega-variables**
+- Each mega variable **encodes** part of the csp
+- Subproblems overlap to ensure **consistent** solutions
+
+![](./images/v4/binary-constraint-graphs.png)
+
+![](./images/v4/tree-decomp.png)
+
+- We take some of the constraints that are tree-structured, call them a **mega variable** and solve each of them
+  - However, we have to put some constraints across the graphs to **ensure** that **common nodes** have the same solution in **all the graphs**
+
+#### **<u>Tree Decomposition requirements</u>**
+
+- A tree decomposition must satisfy the following three requirements
+  1. **Every variable** in the **original problem** appears in **at least one** of the **mega variables**
+  2. If **two variables** connected by a **constraint** in the **original problem**, they must **appear together** in **atleast one** of the subproblems
+  3. If a variable appears in two mega variables $M_1$ and $M_n$, it must also appear in $M_2, M_3, ..., M_{n-1}$.
+- The goal of tree decomposition is to make the subproblems as **small as possible**.
+- If any subproblem has no solution, the original problem has no solution.
+
+#### **<u>Solving Tree Decomposition</u>**
+
+- After solving all the subproblems, we attempt to construct a global solution as follows
+  1. View each subproblem as a **mega variable**, whose domain is the set of **all solutions** to the subproblem.
+  2. We then solve the constraints **connecting the subproblems**, using efficient algorithm for trees given earlier.
+
+****
+
+# **<u>Local Search for CSPs</u>**
+
+- Local search can be used in an **online setting** when the problem changes.
+  - e.g. an airline schedule which is already working, due to weather conditions other constraints are added to it.
+  - Instead of solving the graph from the beginning, you could just run local search to fix it.
+
+## **<u>Steps</u>**
+
+1. Assign all the variables randomly (This will cause some nodes to break constraints)
+2. Search looks for these conflicting nodes and changes their value
+   - We use the **min-conflict** heuristic for choosing a new value for a variable
+3. Repeat until problem is solved.
+
+****
+
+## **<u>Limitations</u>**
+
+- This algorithm is a randomized algorithm
+  - It is not guaranteed to converge
+    - As changing the value of a variable can lead to new conflicts with other variables.
+- However, It usually performs well.
+
+****
+
+## **<u>Constraint Weighting</u>**
+
+- **Constraint Weighting**: Helps concentrate the search on the important constraints
+
+### **<u>Steps</u>**
+
+1. Each constraint in given a **numeric weight** $W_i = 1$ initially for all constaints
+2. At each step of the search, the algorithm chooses a value to change that will result in the **lowest total weight** of all **violated constraints**
+3. The weight are adjusted by incrementing the weight of **each constraint violated by the current assignment**
+
+- This adds weight to the constraints that are proving difficult to solve.
+
+****
 
