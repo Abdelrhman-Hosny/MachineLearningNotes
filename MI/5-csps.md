@@ -1,5 +1,8 @@
 [toc]
 
+<div style='page-break-after: always;'></div>
+
+
 # **<u>Constraint Satisfaction Problems</u>**
 
 First, we'll start by revising what we did in the previous chapter.

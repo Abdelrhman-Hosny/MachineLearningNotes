@@ -1,5 +1,7 @@
 [toc]
 
+<div style='page-break-after: always;'></div>
+
 # **<u>CS188 - Introduction</u>**
 
 - The modern view of AI nowadays is trying to make agents that **act rationally**

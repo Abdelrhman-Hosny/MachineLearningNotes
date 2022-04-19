@@ -1,5 +1,7 @@
 [toc]
 
+<div style='page-break-after: always;'></div>
+
 # <u>**Local Search**</u>
 
 - We'll talk about these algorithms

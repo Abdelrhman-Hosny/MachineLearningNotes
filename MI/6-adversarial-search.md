@@ -1,5 +1,7 @@
 [toc]
 
+<div style='page-break-after: always;'></div>
+
 # <u>**Types of Games**</u>
 
 ### Classification
@@ -40,4 +42,3 @@
 |Adversarial, pure competition||
 
 ****
-
