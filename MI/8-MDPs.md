@@ -172,3 +172,63 @@
   - $\pi^*(s)$ is the **optimal action** from state $s$
 
 ****
+
+## <u>**Bellman's Equation**</u>
+
+![alt](./images/v7/mdp-search-tree3.png)
+
+- If we want to get $V^*(s)$, we don't know how to directly get it, but we can relate it to the q-states below it as follows
+
+$$
+V^*(s) = \max_a \  Q^*(s,a) \\
+Q^*(s,a) = \sum_{s'} P(s'|s,a) . [R(s,a,s') + \gamma V^*(s')]
+$$
+
+- This formula assumes that, we get the reward of the state you're going to.
+- In the lectures, it is written as follows
+  
+  $$V^*(s) = R(s) + \gamma \max_a \sum_{s'} P(s'|s,a) V^*(s')$$
+- This assumes that, when we exit a state we get the reward of the current state, not the one we're going.
+
+- These are called **one-step lookahead equation**.
+****
+
+## <u>**Value Iteration Algorithm**</u>
+
+![alt](./images/v7/inf-mdp-search-tree.png)
+
+- If we look at the tree, we'll find two problems
+  1. States are repeated
+     - Solve each problem once and cache the result
+  2. Tree is infinite
+     - Do a depth-limited computation, with increasing depth until change is small
+     - Deep parts of the tree don't matter if $\gamma < 1$
+
+### <u>**Time Limited Values**</u>
+
+- We define $V_k(s)$ is the optimal value of $s$, if the game ends in $k$ time steps from now.
+  - This would be equivalent to a **depth $k$ expectimax** from state $s$.
+- This is easier to compute than $V^*(s)$, and allows us to deal with infinite trees.
+
+### <u>**Algorithm**</u>
+
+1. We start by calculating $V_0(s)$ for all states, (no time steps lefts means an expected reward sum of zero)
+2. Given a vector of $V_k(s)$ values, we do expectimax for each state for a depth of 1
+   $$V_{k+1}(s) \leftarrow \max_a P(s'| s,a) [ R(s,a,s') + V_k(s')$$
+   Bellman's equation relates $V_k$ and $V_{k+1}$, and we know $V_k$, so we can use this algorithm to calculate $V_{k+1}$, until we reach  the desired height.
+3. Repeat until convergence
+
+- **N.B.** Each iteration increases the depth by one
+  - In that iteration, you compute $V_{k+1}$ for **all states**.
+
+#### <u>**Complexity of each iteration**</u>
+
+- $O(S^2A)$
+
+#### <u>**Optimality**</u>
+
+- There is a proof that this converges to an optimal value.
+- Policy may converge before values do
+  - i.e. Actions will remain the same, and only the values change.
+
+
