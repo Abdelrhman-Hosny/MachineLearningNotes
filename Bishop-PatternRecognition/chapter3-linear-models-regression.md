@@ -40,7 +40,7 @@
 
 ****
 
-### **<u>Examples of Basis Functions</u>**
+#### **<u>Examples of Basis Functions</u>**
 
 - In the polynomial curve fitting example, we used the basis function $\phi_j(x) = x^j$.
 
@@ -79,7 +79,7 @@ The analysis applied in this chapter is usually **independent** of the **choice 
 
 ****
 
-## <u>**ML and Least Squares**</u>
+### <u>**ML and Least Squares**</u>
 
 - Previously, we fitted polynomial functions to datasets by **minimizing a sum-of-squares** error function.
 
@@ -153,7 +153,7 @@ The analysis applied in this chapter is usually **independent** of the **choice 
 
 ****
 
-## **<u>Geometry of least squares</u>**
+### **<u>Geometry of least squares</u>**
 
 ![](./Images/ch3/geometry-least-squares.png)
 
@@ -170,17 +170,17 @@ The analysis applied in this chapter is usually **independent** of the **choice 
 
 ****
 
-## **<u>Sequential Learning</u>**
+### **<u>Sequential Learning</u>**
 
 - Sequential learning is applying techniques like **stochastic gradient descent** aka **sequential gradient descent**.
 
 ****
 
-## **<u>Regularized least squares</u>**
+### **<u>Regularized least squares</u>**
 
 - We had previously introduced the **regularization term** that controls the **relative importance** of the **data-dependent error** $E_D(\mathbf w)$ and the **regularization term** $E_W(\mathbf w)$.
   - $$
-  E_D(\mathbf w) + \lambda E_W(\mathbf w)
+    E_D(\mathbf w) + \lambda E_W(\mathbf w)
     $$
 - One of the simplest form of regularizers is given by the **sum of squares of the weights**
   $$E_W(\mathbf w) = \frac{1}{2} \mathbf w^T\mathbf w$$
@@ -195,3 +195,299 @@ The analysis applied in this chapter is usually **independent** of the **choice 
   $$\frac{1}{2}\sum_{n=1}^N \{t_n - \mathbf{w^T}\phi(\mathbf x_n)\}^2 + \frac{\lambda}2  \sum^M_{j=1}|w_j|^q$$
   - In the case of $q=2$, this is the **quadratic regularizer** which was discussed above
   - In the case of $q=1$, the regularizer is known as the **lasso**, it has the property that if $\lambda$ is sufficiently large, some of the cofficients $w_j$ will be zero, leading to a **sparse model**.
+
+****
+### Multiple Outputs
+
+- A basic thing to do is to just create a **different set of basis functions** for each component of $mathbf{t}$.
+  - This leads to **multiple independent regression** problems.
+
+- A more interesting and **more common** approach is to use the **same set** of basis on all of the components of the target vector.
+
+$$y(\mathbf{x,w}) = \mathbf{W}^T \phi (\mathbf{x})$$
+
+- where $\mathbf{y}$ is a $K$-dimensional column vector, $\mathbf{W}$ is a $M \times K$ matrix of parameters and $\phi(x)$ is an $M$-dimensional vector.
+  - This is done so $\mathbf{W}^T \phi(\mathbf(x))$ outputs a $K$-dimensional vector straight away.
+
+****
+
+- if we have a set of observations $t_0,...,t_N$, we can combine them into a matrix $\mathbf{T}$ of size $N \times K$.
+- we can then express the conditional distribution of the target vector in the guassian form.
+
+$$
+  p(\mathbf{t}|\mathbf{x}, \mathbf{W}, \beta ) = \mathcal{N}(\mathbf{t|W^T \phi(x)}, \beta^{-1} \mathbf{I}
+$$
+
+- If we take the log of the likelihood
+
+$$
+  \ln p(\mathbf{T|X,W}, \beta) = \frac{NK}{2} \ln (\frac{\beta}{2 \pi}) - \frac{\beta}{2} \sum^N_{n=1} ||t_n - \mathbf{W^T}\phi(x_n)||^2
+$$
+
+- The closed form solution is the pseudo-inverse just like the previous case
+  $W_{ML} = (\Phi^T \Phi)^{-1} \Phi^T T$
+
+- If we examine this for each $t_k$ separately, we get
+$w_k = (\Phi^T \Phi)^{-1} \Phi^T \mathbf{t}_k$
+
+****
+
+## Bias variance decomposition
+
+- We've seen that using **maximum likelihood (least squares)** can lead to **severe over-fitting** if complex models are trained on datasets of limited size
+- On the other hand, If you **limit** the **number of basis functions** $M$, this will limit the **flexibility of the model** to capture **interesting and important trends in data**.
+- To "solve" this, we introduced **regularization**, but how do we choose the correct value for $\lambda$ ?
+
+----------
+
+- Overfitting is a **property of maximum likelihood** and **doesn't arise when we marginalize over parameters in a Bayesian setting**.
+- It is helpful to consider a **frequentist** point of view of the **model complexity issue** known as the **bias-variance tradeoff**.
+  - It is introduced in the linear basis function models, but the concept is applied to other functions as well.
+
+- The expectation of the loss can be written as
+  $$
+    \mathbf{E}[L] = \int \{y(\mathbf{x}) - h(\mathbf{x})\}^2 p(\mathbf{x}) d\mathbf{x}  + \int \{t - h(\mathbf{x})\}^2 p(\mathbf{x}) d\mathbf{x} dt 
+  $$
+
+  - Where $y$ is our prediction, $h$ is the actual pattern (without the noise) and $t$ is the target.
+- We can see that the second term is independent of $y$, it arises from the **intrinsic noise in the data** .
+  - This represents the **minimal achievable value of expected loss**.
+- The first term is the one we seek to minimize as it depends on the choice of $y$ which is what we can control.
+- If we had unlimited data and computation, we could model $h$ exactly and then the error would only be the second term.
+  - But in practice, we only have a limited supply of data $\mathcal{D}$ where $N$ is finite
+
+----------
+
+- If we model $h(\mathbf{x}) using a **parametric function** $y(\mathbf{x,w})$ governed by a parameter vector $\mathbf{w}$. From a
+  - **Bayesian Perspective** 
+    - The uncertainty in our model is expressed through a **posterior distribution over** $\mathbf{w}$
+  - **Frequentist Perspective** 
+    - Involves making a point estimate of $\mathbf{w}$ based on the dataset $\mathcal{D}$.
+    - Then tries to interpret uncertainty of this estimate through the following experiment
+
+### Frequentist uncertainty estimate
+
+- Assume we have a large number of **datasets** each of size $N$ and each drawn independently from the distribution $p(t, \mathbf{x})$
+- For any given dataset $\mathcal{D}$, we run our learning algorithm and get a function $y(\mathbf{x}; \mathcal{D})$.
+- Different datasets will lead to different parameters and different values of the loss.
+- We assess the **performance** of a **learning algorithm** through taking the **average over this ensemble of datasets**.
+
+- We only have control over the first term of the loss which was $\{y(\mathbf{x}) - h(\mathbf{x})\}^2$.
+  - If we add and subtract $E_\mathcal{D}[y(\mathbf{x}; \mathcal{D})]$ inside the curly brackets, we get the following
+
+    $$
+    \{y(\mathbf{x}) - E_\mathcal{D}[y(\mathbf{x}; \mathcal{D})]+ E_\mathcal{D}[y(\mathbf{x}; \mathcal{D})] - h(\mathbf{x})\}^2 \\
+    = \{ y(\mathbf{x}) - E_\mathcal{D}[y(\mathbf{x}; \mathcal{D})]\}^2  
+    + \{ E_\mathcal{D}[y(\mathbf{x}; \mathcal{D})] - h(\mathbf{x})\}^2 \\
+    + 2 \ \{ y(\mathbf{x}) - E_\mathcal{D}[y(\mathbf{x}; \mathcal{D})]\} \ \{E_\mathcal{D}[y(\mathbf{x}; \mathcal{D})] - h(\mathbf{x})\}  
+    $$
+
+- If we take the expectation of that term, the final term will vanish and two terms will remain.
+
+$$
+ \mathbf{E}_\mathcal{D} [\{y(\mathbf{x}) - h(\mathbf{x})\}^2 ] \\
+  = \{ E_\mathcal{D}[y(\mathbf{x}; \mathcal{D})] - h(\mathbf{x}) \}^2  + E_\mathcal{D}[\{y(\mathbf{x}; \mathcal{D}) - E_\mathcal{D}[y(\mathbf{x}; \mathcal{D})]\}^2]
+$$
+- The first term is the $(\text{bias})^2$
+  - It represents how the **average prediction over all datasets** differs from the **desired regression function** $h$
+- The second term is the **variance** 
+  - measures the extent to whcih the **solutions for *individual datasets* vary around their average** 
+  - i.e. measures the extent to which the function $y(\mathbf{x}; \mathcal{D})$ is sensitive to the **particular choice of dataset** (All sampled independently from $p(\mathbf{x}, t)$
+
+So we can rewrite the loss as
+
+$$
+  \text{expected loss} = (\text{bias})^2 + \text{variance} + \text{noise}
+$$
+
+- Our goal is to pick a model that leads to the **best balance between bias and variance**.
+  - More complex models reduce bias but increase variance.
+  - Less complex models increase bias but reduce variance
+
+----------
+
+- Although the bias-variance decomposition is a good theoretical way to understand model complexity in a frequentist setting.
+  - It is not very practical as we don't have multiple datasets, we only have 1 and separating it into multiple smaller ones would increase the level of overfitting.
+
+- Given these limitations, we turn to the Bayesian treatment of linear basis function models.
+  - This not only provides powerful insights into the issues of over-fitting but also leads to practical techniques for addressing the question of model complexity.
+
+----------
+
+## Bayesian Linear Regression
+
+- We've seen that the effective model complexity is governed by the # of basis functions and needs to be controlled by the size of the dataset
+- A **regularization** term can control the complexity to some extent but the choice of the number and form of the basis functions remains important.
+- Depending on maximum likelihood will always lead to excessive model complexity and over-fitting.
+  - We could use a holdout dataset to determine model complexity, but we would waste computation and data we could've learned from.
+
+- We therefore turn to a **Bayesian treatment of linear regression** which **avoids** the overfitting problem of max likelihood.
+  - This also leads to automatic methods of determining **model complexity** using **the training data alone**.
+
+----------
+
+### Parameter Distribution
+
+- We start by defining a **prior** distribution over the model parameters $\mathbf{w}$.
+  - We will treat the noise parameter $\beta$ as a known constant.
+
+- The **likelihood** function $p(\mathbf{t|w}) = \prod_{n=1}^N \mathcal{N}(t_n|\mathbf{w}^T \phi(\mathbf{x}_n, \beta^{-1})$
+- The conjugate **prior** is expressed as $p(\mathbf{w}) = \mathcal{N}(\mathbf{w}|m_0, S_0)$
+  - Where the mean is $m_0$ and covariance is $S_0$
+
+- Next we compute the **posterior** distribution which is proportional to the product of the prior and the likelihood.
+  - Due to the choice of distribution (conjugate prior), we know that it'll be a **Gaussian**.
+
+- The **posterior** distribution will have the form of (derived previously)
+  $$
+    p(\mathbf{w|t}) = \mathcal{N}(\mathbf{w}|m_N, S_N) \\
+    m_N = S_n(S_0^{-1}m_0 + \beta \Phi^T \mathbf{t}) \\
+    S_N^{-1} = S_0^{-1} + \beta \Phi^T\Phi
+  $$
+
+- **N.B.** Since the posterior is a Guassian, the mean and the mode are the same, so the maximum posterior weight vector $\mathbf{w}_{MAP} = m_N$
+- If we consider an infinitely broad prior $S_0 = \alpha^{-1} \mathbf{I}$ where $\alpha \rightarrow 0$ (this means that the prior doesn't  have any useful information)
+  - The mean $m_N$ of the posterior distribution reduces to the maximum likelihood value $\mathbf{w}_{ML}$
+- Similarly, if $N=0$, then the posterior distribution is the same as the prior
+- If data points arrive **sequentially**, then the posterior distribution at any stage acts as the prior distribution for the subsequent data point.
+
+----------
+
+- There will be an example, and for simplification, we will consider the prior to be an isotropic Gaussian with zero mean.
+  $p(\mathbf{w}|\alpha) = \mathcal{N}(\mathbf{w}|0, \alpha^{-1} I)$
+  - Due to the simplification, the posterior will be given by
+    $$
+      m_N = \beta S_N \Phi^T \mathbf{t} \\
+      S_n^{-1} = \alpha I + \beta \Phi^T \Phi
+    $$
+- The log of the **posterior** distribution is given by the sum of the log **likelihood** and the log of the **prior** as a function of $\mathbf{w}$.
+
+$$
+  \ln p(\mathbf{w|t}) = - \frac{\beta}{2} \sum_{n=1}^N \{ t_n - \mathbf{w}^T \phi(\mathbf{x}_n)\}^2 - \frac{\alpha}{2} \mathbf{w}^T \mathbf{w} + \text{const}
+$$
+
+- Maximization of this posterior distribution w.r.t $\mathbf{w}$ is equivalent to the minimization of the sum-of-squares error function with a quadratic regularization term where $\lambda = \frac{\alpha}{\beta}$.
+
+----------
+
+- We will show an example of learning using Bayesian learning in a linear basis function model as well as the **sequential update** of a posterior distribution using straight line fitting
+  - In our example, we'll consider a single input variable $x$ and a single target $t$ in order to plot the results.
+  - Our model will be $y(x, \mathbf{w}) = w_0 + w_1 x$.
+
+- We will generate target data from the function $f(x, \mathbf{a}) = a_0 + a_1 x$ where $a_0 = -0.3$ and $a_1 = 0.5$.
+  - We also add noise with $\sigma = 0.2$
+  
+- The goal is to recover the values of $a_0$ and $a_1$ from the data.
+
+- We will explore the dependence on the size of the dataset.
+
+- We will asume that noise variance is known and hence we set its value $\beta = (\frac{1}{0.2})^2 = 25$ and similarly we set the parameter $\alpha = 2$
+  - We will also discuss how to set the parameters $\alpha $ and $ \beta$ from the training data.
+
+- The first example is one where we only have the prior and no data points.
+
+  ![](./Images/ch3/bayesian-ex1.png)
+
+- The image in the middle is a distribution for the **prior** distribution.
+- The image on the right show 6 samples from the posterior distribution (in case of no data, posterior = prior)
+  - Each sample from the posterior $p(\mathbf{w| X})$ represents a line (as we only have 2 parameters).
+
+
+- In the second image, we add 1 data point with likelihood $p(\mathbf{X|w})$
+  ![](./Images/ch3/bayesian-ex2.png)
+
+- To get the posterior in the second image, we multiply the likelihood (2nd image) with the posterior (1st image)
+  - This shows the sequential nature of Bayesian learning
+
+- You'll find a white cross on the curve, which represents the original function $f(\mathbf{a}, x)$ from which the data was sampled.
+
+- We see the third image, which represents us adding more data points to the algorithm and watching how it learns.
+  ![](./Images/ch3/bayesian-ex3.png)
+
+- You'll see that the more points added, the closer the distribution gets (lower variance and mean gets closer to real values of $a_0$ and $a_1$).
+
+- If we had infinite points, we would have the posterior be a delta function at the true values of $a_0$ and $a_1$.
+
+----------
+
+- Other forms of the **prior** can be considered, for example we can generalize the Gaussian prior to give
+  $$
+    p(\mathbf{w}|\alpha) = [ \frac{q}2 (\frac{\alpha}{2})^\frac{1}q \frac{1}{\Gamma(\frac{1}q ]}^M \exp(- \frac{\alpha}{2} \sum_{j=1}^M |w_j|^q )
+  $$
+
+- In the case of $q = 2$, this corresponds to the Gaussian distribution and only in this case the prior distribution.
+  - Finding the max of the posterior distribution over $\mathbf{w}$ corresponds to the minimization of the regularized error function.
+  - In the case of the Guassian prior, the mode = mean in the posterior. 
+  - This will not hold if $q \neq 2$
+
+----------
+
+### Predictive distribution
+
+- In practice, we are not interested in the value of $\mathbf{w}$ itself but rather in making predictions of $t$ for new values of $\mathbf{x}$.
+  - This requires we evaluate the **predictive distribution** defined by
+    $$
+      p(t| \mathbf{t}, \alpha, \beta) = \int p(t|\mathbf{w}, \beta) p(\mathbf{w|t}, \alpha, \beta) d\mathbf{w}
+    $$
+    where $\mathbf{t}$ is the vector of target values from the training set.
+  - We've omitted the input vectors from the right hand side of the conditionals to simplify notation.
+  - The result of the integration above will be:
+    $$
+      p(t|\mathbf{x,t}, \alpha, \beta) = \mathcal{N}(t|m_N^T \phi(\mathbf{x}), \sigma^2_N(\mathbf{x})) \\
+      \sigma_N^2(\mathbf{x}) = \frac{1}\beta + \phi(\mathbf{x})^T S_N \phi(\mathbf{x})
+    $$
+    - The first term in $\sigma_N^2(\mathbf{x})$ represents the **noise in the data**
+    - The second term reflects the **uncertainty** associated with the parameters $\mathbf{w}$.
+    - **N.B.** As noise and the parameters $\mathbf{w}$ are independent Gaussians, their variance is additive.
+    - **N.B.** Note that as $N$ increases, the posterior distribution becomes narrower (second term of variance decreases until it goes to zero)
+      - At that point, we will be certain of the values of $\mathbf{w}$ and only variance due to noise in data remains. 
+
+
+### Equivalent kernel
+
+- The **posterior mean solution** for the linear basis function model has a different interpretation.
+- Since the posterior and prior are both Gaussian, then the weights of the model is the same as the mean.
+  - This allows us to do the following
+    $$
+      y(\mathbf{x,m}_n) = \mathbf{m}_N^T \phi(\mathbf{x}) = \beta \phi(\mathbf{x})^T \mathbf{S}_N \Phi^T \mathbf{t} = \sum^N_{n=1} \beta \phi(\mathbf{x})^T \mathbf{S}_N \phi(\mathbf{x}_n) t_n
+    $$
+
+  - The result of this substitution is that, the mean of the predictive distribution at a point $\mathbf{x}$ is given by a **linear combination of the training set target variables** $t_n$
+  We can also rewrite it as
+    $$
+      y(\mathbf{x,m}_N) = \sum_{n=1}^N k(\mathbf{x,x}_n) t_n \\
+      k(\mathbf{x, x}') = \beta \phi(\mathbf{x})^T \mathbf{S}_N \phi(\mathbf{x}')
+    $$
+    - This is known as the **smoother matrix** or the **equivalent kernel**.
+    - They make their predictions by taking a **linear combination** of the training set target values known as **linear smoothers**
+      - The equivalent kernel depends on the input values $\mathbf{x}_n$ from the dataset as these appear in the definition of $\mathbf{S}_N$.
+    - Data points closer to $x$ are given higher weight than points that are far away from it.
+
+----------
+
+- This formulation suggests an alternative approach to regression.
+- Instead of introducing a set of basis functions, which **implicitly** determines an **equivalent kernel**
+- We can instead define a **localized kernel directly** and use it to make prediction for new input vectors $\mathbf{x}$ given the observed training set.
+- This leads to a practical framework for regression and classification called **Gaussian processes**  which will be discussed in chapter 6.
+
+----------
+
+- The weights of the training have to sum up to 1.
+  $$
+    \sum_{n=1}^N k(\mathbf{x,x}_n) = 1
+  $$
+
+- Note that the weigth **can be negative**
+
+- An **important** property of all kernels is that they can be **expressed as an inner product**
+  $$
+    k(\mathbf{x,z}) = \psi(\mathbf{x})^T \psi(\mathbf{z}) \\
+
+    \psi(\mathbf{x}) = \beta^{\frac{1}2)} \mathbf{S}{\frac{1}2)} \phi(\mathbf{x})
+  $$
+
+----------
+
+## Bayesian Model Comparison
+
+

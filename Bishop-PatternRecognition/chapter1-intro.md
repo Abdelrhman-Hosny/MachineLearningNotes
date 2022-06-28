@@ -65,7 +65,10 @@ and for the error we use the **RMSE**.
 We can see that at $M=9$ and $N=10$, the training set error goes to zero but why at $M=9$ precisely ?
 
 - At $M=9$, this polynomial contains **10 degrees of freedom** corresponding to the **10 coefficients**. $w_0,.....,w_9$ and so it can be tuned exactly to the **10 data points** in the training set.
+  - **Degree of Freedom**: This is the **independent** pieces of information that is known.
   - This is why we can afford a more complex data model as $n$ (amount of data increases), because at a high $n$, we have a higher degree of freedom, so we can increase $k$ (# of features) without overfitting.
+
+- **N.B.** The coefficient $w_0$ is often removed from the regularization as if included it'll cause the model to depend on the **choice of origin of the target variable**.
 
 ****
 
@@ -184,7 +187,7 @@ Check the notes from probability course
   $$
   Now our objective is to
   $$
-  max\ ln( p(\bf t|\bf x,\bf w, \beta)) \ 
+  max\ ln( p(\bf t|\bf x,\bf w, \beta)) \
   $$
 
 - finding $\bf w_{ML}$
@@ -214,6 +217,8 @@ Check the notes from probability course
   $$
 
 ****
+
+- In frequentist settings, we do **MLE**, in Bayesian settings, we do **MAP**
 
 - If we take a step back towards a more Bayesian approach and introduce a **prior distribution**.
 
