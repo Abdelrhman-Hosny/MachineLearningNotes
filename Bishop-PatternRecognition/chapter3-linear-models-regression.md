@@ -490,4 +490,142 @@ $$
 
 ## Bayesian Model Comparison
 
+- We will talk about the **model selection** from a **Bayesian perspective**, the discussion will be general, then we'll see how they are applied to the determination of regularization parameters in linear regression.
+- Overfitting associated with maximum likelihood **can be avoided** by **marginalizing** over model parameters instead of making point estimates of their values.
+- Models can then be trained directly on the training set, without a need for a validation set and all the computation that comes with it.
+  - this allows multiple **complexity parameters** to be determined simultaneously as **part of the training process.**
+
+- The **Bayesian view of model comparison** simply involves the **use** of probabilities to **represent uncertainty** in the choice of model.
+
+----------
+
+- Assume we're comparing $L$ models $\{ \mathcal{{M}_i } \}   \ \, \ i = 1,...,L$ 
+  - where each model represents a **probability distribution over the observed data** $\mathcal{D}$
+  - We assume that the data is generated from one of these models, but we don't know which one.
+
+- Our uncertainty is expressed through a **prior distribution** $p(\mathcal{{M}_i })$
+- Given a training set $\mathcal{D}$, we wish to evaluate the **posterior distribution**.
+
+  $$
+      p(\mathcal{{M}_i }|\mathcal{D}) \propto p(\mathcal{{M}_i }) p(\mathcal{D}|\mathcal{{M}_i })
+  $$
+
+- The prior allows us to **express a preference** for different models.
+- If we simplify and give all models an equal prior distribution, we'll only care about $p(\mathcal{D}|\mathcal{{M}_i })$
+  - This term expresses the **preference shown by the data for different models**
+    - It is also sometimes called **marginal likelihood** as it can be viewed as a likelihood function over the space of models.
+
+- The ratio between two model evidences $\frac{p(\mathcal{D}|\mathcal{{M}_i })}{p(\mathcal{D}|\mathcal{{M}_j })}$ is known as **Bayes factor**
+  
+- Once we know the posterior distribution over models, the **predictive distribution** is given by
+  $$
+    p(t| \mathbf{x}, \mathcal{D}) = \sum^L_{i=1}  p(t| \mathbf{x}, \mathcal{M}_i, \mathcal{D}) p(\mathcal{\mathcal{M}_i}|\mathcal{D})
+  $$
+
+- This is an example of a **mixture distribution** in which the overall predictive distribution is obtained by **average the predictive distribution** $p(t| \mathbf{x}, \mathcal{M}_i, \mathcal{D})$ of **multiple** individual models **weighted by the posterior probabilities** $p(\mathcal{\mathcal{M}_i}|\mathcal{D})$ of those models.
+- So, if two models that are **a-posteruiru equally likely** and one predicts a narrow distribution around $t = a$ and the other a narrow distribution around $t=b$
+  - The overall predictive distribution will be a **bimodal distribution** at $t=a$ and $t=b$, not a single model at $t = \frac{a + b}2$.
+- **Model selection** can happen by **selecting the most probable model** alone to make predictions.
+
+----------
+
+- For a model with a set of parameters $\mathbf{w}$, the **model evidence** is given by
+  $$
+    p(\mathcal{D}|\mathcal{M}_i) = \int p(\mathcal{D}| \mathbf{w}, \mathcal{\mathcal{M}_i}) p(\mathbf{w}|\mathcal{\mathcal{M}_i}) d\mathbf{w}
+  $$
+
+- From a sampling perspective, the **marginal likelihood** can be viewed as the probability of generating a dataset $\mathcal{D}$ from a model whose parameters are **sampled at random from the prior**.
+
+- It's also intereseting to note that the evidence is the **normalizing term** in Bayes' theorem when evaluating the **posterior distribution over parameters**
+  $$
+    p(\mathbf{w}|\mathcal{D, M}_i) = \frac{p(\mathcal{D}| \mathbf{w}, \mathcal{\mathcal{M}_i}) p(\mathbf{w}|\mathcal{\mathcal{M}_i})}{p(\mathcal{D|M}_i)}
+  $$
+
+----------
+
+- If we make some simple approximations over the integral parameters, we can obtain some insight into **model evidence** 
+  1. consider that the model has a single parameter $w$, where $p(w) \propto p(\mathcal{D}|w) p (w), we omit the dependence on $\mathcal{M}_i$ for simplicity.
+  2. if we assume that the posterior distribution is sharply peaked around the most probable value $w_{MAP}$ with width $\Delta w_{\text{posterior}}$, we can approximate the integration into length times width.
+  3. If we also assume that the prior is flat with width $\Delta w_{\text{prior}}$, $p(w) = \frac{1}{\Delta w_{\text{prior}}}$
+
+  ![](./Images/ch3/approx-integral.png) 
+
+- This results in the following
+  $$
+
+  p(\mathcal{D}) = \int p(\mathcal{D}|w)p(w)dw \approx p(\mathcal{D}|w_{\text{MAP}}) \frac{\Delta w_\text{posterior}}{\Delta w_\text{prior}}  
+  $$
+- If we take the log, we get
+
+  $$
+
+  \ln p(\mathcal{D}) \approx  \ln p(\mathcal{D}|w_{\text{MAP}}) + \ln (\frac{\Delta w_\text{posterior}}{\Delta w_\text{prior}} )
+  $$
+
+- The first term represents the **fit to the data** given by the **most probable parameter values** (for a flat prior, this corresponds to the log likelihood)
+- The second term **penalizes the mode for its complexity**
+  - since $\Delta w_\text{posterior} < \Delta w_\text{prior}$, the term is negative.
+  - $\frac{\Delta w_\text{posterior}}{\Delta w_\text{prior}}$ gets smaller, if parameters are finely tuned to the data in the posterior distribution. (resulting in worse penalty)
+
+- If a model has $M$ parameters, all with the same ratio of $\frac{\Delta w_\text{posterior}}{\Delta w_\text{prior}}$
+  $$
+  \ln p(\mathcal{D}) \approx  \ln p(\mathcal{D}|w_{\text{MAP}}) + M \ln (\frac{\Delta w_\text{posterior}}{\Delta w_\text{prior}} )
+  $$
+
+- Thus, the size of complexity penalty increases linearly with the **number of parameters** $M$.
+- The optimal model complexity will be given in a tradeoff between the **first and second terms**.
+
+----------
+
+![](./Images/ch3/data-distrib-3-models.png) 
+
+- The image above can help us understand how marginal likelihood can favor models of **intermediate complexity**.
+- The horizontal axis represents the **space of possible datasets**, so each point on the axis corresponds to a **specific dataset**.
+- If we now consider 3 models $\mathcal{M}_1$ ,  $\mathcal{M}_2$ and  $\mathcal{M}_3$ of successively increasing complexity.
+- Imagine if we run these models **generatively** to produce example datasets, and then look at the distribution of datasets that result.
+- Any given model can generate a **variety of datasets** since the parameters are governed by a **prior probability distribution** and for any choice of parameters there may be **random noise on the target variables**.
+
+----------
+
+(this is the same image as above)
+![](./Images/ch3/data-distrib-3-models.png) 
+
+- To generate a particular dataset from a specific model, we first choose the values of the parameters from their prior distribution $p(\mathbf{w})$, and then from these parameters, we sample the data from $p(\mathcal{D}|\mathbf{w})$
+- A simple model like $\mathcal{M}_1$ has **little variability**, so the datasets it generates will be **fairly similar** (smaller range of datasets).
+- By contrast, a complex model can generate a **great variety** if datasets, so its distribution $p(\mathcal{D})$ is spread over a **large region** of the space of datasets.
+- If we look at the point $\mathcal{D}_0$, we can see that the **highest value of the evidence** $p(\mathcal{D,M}_i)$ belongs to the model of **intermediate complexity**.
+  - This happens due to the follwoing reasons
+    1. The simpler model cannot fit the data well.
+    2. The more complex model soreads its predictive probability over too broad a range of datasets, and so assigns a **relatively small probability to any of them**.
+
+----------
+
+- In the Bayesian model comparison framework, it's assumed that the **true distribution** from which the data is generated is **contained withing the set of models under cosideration**.
+
+- Based on this assumption, we can show that Bayesian model comparison will on average **favour the correct model**.
+  - To see this, we consider two models $\mathcal{M}_1$ and $\mathcal{M}_2$ in which the truth corresponds to $\mathcal{M}_1$.
+
+- For a given finite dataset, it's possible for the Bayes factor to be **larger for the incorrect model**.
+  - However, if we average the **Bayes factor** over the **distribution of datasets**, we obtain the expected Bayes factor in the form
+    $$
+      \int p(\mathcal{D|M}_1) \ln \frac{p(\mathcal{D|M}_1)}{p(\mathcal{D|M}_2)} d\mathcal{D}
+    $$
+
+- This average has been taken w.r.t to the true distribution of the data.
+- The quantity is an example of the **Kullback-Liebler** divergence (measures dissimilarity between two distributions).
+  - Thus on average, the Bayes factor will always favour the correct model.
+
+----------
+
+- We've seen that the Bayesian framework **avoids** the problem of **overfitting** and allows models to be **compared on the basis of the training data alone**.
+- However a **Bayesian approach** like any approach to pattern recognition, needs to make **assumptions** about the **form of the model**.
+  - If these are **invalid**, then the results can be **misleading**.
+
+- The model evidence can be sensitive to **many aspects of the prior**, such as the **behavior of the tails**.
+- **N.B.** An improper prior is a prior that doesn't have to be a proper distribution.
+- The evidence is not defined if the prior is improper, as can be seen by noting that an improper prior has an arbitrary scaling factor.
+- If we consider a proper prior then take a suitable limit in order to obtain an improper prior, the eveidence will **go to zero**.
+  - It may then be possible to consider the **evidence ratio** between **two models first** then take a limit to obtain a meaningful answer.
+
+- In a practical application, it will be wise to keep aside an **independent test set** of data on which to evaluate the overall performance of the final system.
 
