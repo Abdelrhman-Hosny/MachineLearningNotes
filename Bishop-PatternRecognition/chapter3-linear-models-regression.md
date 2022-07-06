@@ -629,3 +629,59 @@ $$
 
 - In a practical application, it will be wise to keep aside an **independent test set** of data on which to evaluate the overall performance of the final system.
 
+----------
+
+## Evidence Approximation 
+
+- In a **fully** Bayesian treatment of the linear basis function model, we would introduce **prior distributions** over the **hyperparameters** $\alpha$ and $\beta$.
+  - We would then use them to make predictions by **marginalizing** w.r.t these **hyperparameters** as well as the **parameters** $\mathbf{w}$.
+
+- Although we can do the integration, the complete marginalization over all of these variables is **analytically intractable** (hard to deal with)
+
+- We'll discuss an **approximation** in which we set the **hyperparameters** to **specific values** determined by **maximizing** the **marginal likelihood function** obtained by marginalizing over $\mathbf{w}$ only.
+  - This framework has a lot of names like :
+    - empirical Bayes, type 2 maximum likelihood, generalized maximum likelihood or **evidence approximation**.
+
+----------
+
+- If we introduce **hyperpriors** over $\alpha$ and $\beta$, the predictive distribution is obtained by marginalizing over $\mathbf{w}$, $\alpha$ and $\beta$
+  $$
+    p(t|\mathbf{t}) = \int \int \int p(t|\mathbf{w}, \beta) p(\mathbf{w|t},\alpha ,\beta) p(\alpha, \beta| \mathbf{t}) \ d\mathbf{w} d\alpha d\beta
+  $$
+
+- If the posterior distribution  $p(\alpha, \beta| \mathbf{t})$ is peaked around values $\hat \alpha$ and $\hat \beta$, we would only need to marginalize over $\mathbf{w}$
+  $$
+    p(t|\mathbf{t}) \approx p(t|\mathbf{t}, \hat \alpha, \hat \beta) = \int p(t| \mathbf{w}, \hat \beta) p(\mathbf{w|t}, \hat \alpha , \hat \beta) \ d\mathbf{w}
+  $$
+
+- From Bayes' theorem, the posterior distribution for $\alpha$ and $\beta$ is given by
+  $$
+    p(\alpha, \beta| \mathbf{t}) \propto p(\mathbf{t}|\alpha, \beta ) p(\alpha, \beta)
+  $$
+
+- If the prior $p(\alpha, \beta)$ is relatively flat, then in the **evidence framework** the values of $\hat \alpha$ and $\hat \beta$ are obtained by **maximizing the marginal likelihood** function $p(\mathbf{t}|\alpha, \beta)$
+
+- We will proceed by **evaluating** the **marginal likelihood** for the linear basis function model and then **finding its maxima** 
+  - This will allow us to **determine the values** for these **hyperparameters** from the **training data alone**, without recourse to cross-validation.
+
+- Recall that the ratio $\frac{\alpha}{\beta}$ is analogous to the **regularization parameter**.
+
+- **N.B.** 
+  - If we define a **conjugate prior distributions** over $\alpha$ and $\beta$, then the marginalization over these hyperparameters can be performed analytically to give a Student's $t$-distribution over $\mathbf{w}$.
+  - Although the resulting integral over $\mathbf{w}$ is no longer analytically tractable, it could be **approximated** 
+  - This might provide a **practical alternative** to the evidence framework.
+  - However, the integrand as a function of $\mathbf{w}$ typically has a **strongly skewed mode** so that the Laplace approximation **fails to capture the bulk of the porbability mass**
+    - This leads to poorer results than those obtained by maximizing the evidence
+
+- There are **two approaches** to maximize the evidence
+  1. Evaluate the evidence analytically and then set the derivative to zero to obtain re-estimation for $\alpha$ and $\beta$
+  2. Use a technique called the **expectation maximization algorithm** (EM algorithm)
+
+- Both approaches converge to the **same solution**.
+
+
+----------
+
+### Evaluation of the evidence function
+
+
