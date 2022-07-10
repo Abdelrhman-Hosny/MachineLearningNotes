@@ -211,8 +211,209 @@
 
 ----------
 
+## Distributional forecasts and prediction intervals
 
+### Forecast distributions
 
+- We express the uncertainty in our forecasts using a **probability distribution**
+  - It describes the probability of **observing future values using the fitted model** 
 
+- The point forecast is the **mean of this distribution**
 
+- Most time series models produce **normally-distributed forecasts** 
+  - i.e. we assume that the distribution of possible future values follows a normal distributions
+
+- We'll look at a couple of alternatives to normal distributions later on
+
+----------
+
+### Prediction intervals
+
+- A prediction interval gives an interval.
+  - We expected $y_t$ to lie in **that interval** with a **specified probability** 
+
+- For example, if we assume that the distribution of future observations is normal, a 95% prediction interval for the $h$-step forecast is
+  $$
+    \hat y_{T+h|T} \pm 1.96 \hat \sigma_h
+  $$
+  where $\hat \sigma_h$ is an estimate of the standard deviation of the $h$-step forecast distribution
+
+- More generally, a prediction interval can be written as
+  $$
+    \hat y_{T+h|T} \pm c \hat \sigma_h
+  $$
+  where the multiplier $c$ depends on the coverage probability
+  - We usually calculate $80%$ intervals and $95%$ intervals, although any percentage may be used.
+
+![](./images/ch5/values-for-confidence-intervals.png)
+
+- The value of prediction intervals is that they **express the uncertainty** in the forecasts.
+  - If we only produce point forecasts, there is no way of telling how accurate the forecasts are
+
+- Point forecasts can be of almost no value without the accompanying prediction intervals
+
+----------
+
+### One-step prediction intervals
+
+- When forecasting one step ahead, the standard deviation of the forecast distribution can be estimated using the standard deviation of the residuals given by
+  $$
+    \hat \sigma = \sqrt{\frac{1}{T - K - M} \sum^T_{t=1} e_t^2}
+  $$
+  where $K$ is the number of parameters estimated in the forecasting method, and $M$ is the number of missing values in the residuals.
+    - e.g. $M = 1$ for a naive forecast as we can't forecast the first observation
+
+#### Example
+
+- If we consider a naive forecast for the Google stock price data
+  ![](https://otexts.com/fpp3/fpp_files/figure-html/google2015-1.png)
+  - The last value of the observed series is $758.88$, so the forecast for the next value is $758.88$.
+    - The standard deviation of the residuals is $11.19$ (has a form discussed in 5.1)
+  - So with a 95% prediction interval for the next value is given as 
+    $$
+      758.88 \pm 1.96 (11.19) = [736.9, 780.8]
+    $$
+
+----------
+
+### Multi-step prediction intervals
+
+- A common feature of prediction intervals is that they usually increase in length as the forecast horizon increases.
+  - The further ahead we forecast, the more uncertainty is associated with the forecast, thus the wider the prediction intervals
+  - That is, $\sigma_h$ usually increases with $h$ (although some non-linear forecasting methods don't have this property)
+
+- To produce a prediction interval, it is necessary to have an estimate of $\sigma_h$
+  - For one step forecasts $h=1$, the equation from 5.1 provides a good estimate of the forecast std dev $\sigma_1$.
+  - For multi-step forecasts, a more complicated method of calculation is required
+    - These calculations assume that the residuals are **uncorrelated**
+
+----------
+
+### Benchmark methods
+
+- For the 4 benchmark methods, it is possible to mathematically derive the forecast standard deviation under the assumption of uncorrelated residuals.
+
+  - If $\hat \sigma_h$ denotes the standard deviation of the $h-$step forecast distribution, and $\hat \sigma$ is the residual standard for $h=1$.
+    - We can then use expressions from the table below to approximate these values
+
+  | Benchmark method   | $h-$step forecast standard deviation    |
+  |--------------- | --------------- |
+  | Mean   | $\hat \sigma_h = \hat \sigma \sqrt{1 + \frac{1}{T}}$   |
+  | Naive   | $\hat \sigma_h = \hat \sigma \sqrt{h}$ |
+  | Seasonal naive   | $\hat \sigma_h = \hat \sigma \sqrt{k + 1}$    |
+  | Drift   | $\hat \sigma_h = \hat \sigma \sqrt{h \frac{1 + h}{T - 1}}$  |
+
+- Example for confidence intervals
+  ![](https://otexts.com/fpp3/fpp_files/figure-html/googforecasts2-1.png)   
+
+----------
+
+### Prediction intervals from bootstrapped residuals
+
+- When a **normal distribution** for the residuals is an **unreasonable assumption**
+  - one alternative is to use **bootstrapping** which only assumes that the residuals are **uncorrelated** with **constant variance** 
+
+- A one-step forecast error is defined as $e_t = y_t - \hat y_{t|t - 1}$
+  $$
+    y_t = \hat y_{t|t - 1} + e_t
+  $$
+  - So we can simulate the next observation of a time series using
+    $$
+      y_{T+1} = \hat y_{T+1|T} + e_{T+1}
+    $$
+    Assuming that future error $e_{T+1}$ will be similar to past errors, we can replace $e_{T+1}$ by sampling from the collection of errors we have seen in the past.
+  - After prediction, we add the simulated observation to our dataset, we repeat the process to obtain
+    $$
+      y_{T + 2} = \hat y_{T+2| T + 1} + e_{T+2}
+    $$
+    where $e_{T+2}$ is another draw from the collection of residuals.
+
+  - If we continue this way, we can simulate an entire set of future values for our time series.
+  
+  ![](https://otexts.com/fpp3/fpp_files/figure-html/showsim-1.png) 
+  Five simulated future paths of google closing stock price (naive method with bootstrapped residuals)
+- Then we compute prediction intervals by calculating percentiles of the future sample paths for each horizon
+  - The result is a **bootstrapped** prediction interval
+
+----------
+
+## Forecasting using transformations
+
+- We've discussed some common transformations which can be used when modelling
+  - when forecasting a model with transformations, we first produce forecasts on **transformed data**. Then, we **reverse the transformations** to obtain forecasts on the **original scale**
+
+----------
+
+### Prediction intervals with transformations
+
+- If a transformation has been used, then the prediction interval is first computed on the transformed scale and the end points are **back-transformed** to give a prediction interval on the original scale.
+
+### Bias adjustments
+
+- One issue with using mathematical transformations such as Box-Cox transformations is that the back-transformed point forecast will **not be the mean of the forecast distribution**.
+  - It will usually be the **median of the forecast distribution** (assuming that the distribution on the transformed space is symmetric)
+
+- In many cases, this is **acceptable**, although the mean is usually **preferable**.
+  - For example, you may wish to add up sales forecasts from various regions to form a forecast for the whole country
+    - In that case, median would be bad as it doesn't add up, While means add up.
+
+- When we modify the transformation to give the mean rather than the median, we say that point forecasts have been **bias-adjusted**
+
+- Example using drift method (Mean vs Median)
+  ![](https://otexts.com/fpp3/fpp_files/figure-html/biasadjust-1.png) 
+
+----------
+
+## Forecasting with decomposition
+
+- Time series decomposition can be a useful step in producing forecasts
+
+- Assuming an additive decomposition, the decomposed time series can be written as
+  $$
+    y_t = \hat S_t + \hat A_t \\
+    \hat A_t = \hat T_t + \hat R_t
+  $$
+- Or in the case of a multiplicative decomposition
+  $$
+    y_t = \hat S_t \times \hat A_t
+  $$
+
+- To forecast a decomposed time series, we forecast the seasonal component $\hat S_t$ and the seasonally adjusted component $\hat A_t$ **separately**
+
+- It is usually assumed that the seasonal component is **nearly unchanging**, so it is forecast by simply taking the **last year of the estimated component**
+  - i.e. a **seasonal naive method** is used for the seasonal component
+
+- To forecast the seasonally adjusted component, any non-seasonal forecasting method can be used (discussed in later chapters).
+
+----------
+
+## Testing and validation sets
+
+- Similar to ML
+
+### Time Rolling Cross-validation
+
+- You start by training your data on the first $k$ examples, where $k < N$
+  - You then predict the value of the $k + 1$ element
+  - Increment $k$ and repeat until $k = N$
+  ![](https://otexts.com/fpp3/fpp_files/figure-html/cv1-1.svg)
+  - Blue is training, red is test, grey is ignored/not yet reached
+
+- You can modify this to perform a multi-step forecast
+  ![](https://otexts.com/fpp3/fpp_files/figure-html/cv4-1.svg)
+
+----------
+
+## Evaluating distributional forecast accuracy
+
+TODO : Finish Later
+
+- All the previous methods measued **point forecast accuracy**, so we'll need other measures when evaluation distributional forecasts
+
+### Quantile scores
+
+- If we consider the google stock price example with an 80% prediction interval for the forecasts from the naive method
+  ![](https://otexts.com/fpp3/fpp_files/figure-html/googlepi-1.png)
+
+  - The lower limit of this prediction gives the 10th percentile (0.1 quantile) of the forecast distribution.
 
