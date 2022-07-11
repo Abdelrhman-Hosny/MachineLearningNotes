@@ -1,5 +1,7 @@
 [toc]
 
+<div style='page-break-after: always;'></div>
+
 # <u>**Reinforcement Learning**</u>
 
 ## <u>**RL Map in CS188**</u>
@@ -143,9 +145,9 @@ RL in CS188 ----|                 ---- Passive RL  -------|
 
 - What is bad about it ?
   - Wastes information about state correlations.
-  ![alt](./images/v10/direct-eval-2.png)
-  For example, E has a score of -2, while c has a score of 4.
-  This doesn't make sense as E has to pass through c which makes them highly correlated, so it doesn't make sense to have completely different utilities
+    ![alt](./images/v10/direct-eval-2.png)
+    For example, E has a score of -2, while c has a score of 4.
+    This doesn't make sense as E has to pass through c which makes them highly correlated, so it doesn't make sense to have completely different utilities
     - This is analogous to incosistent heuristics, when we talked about search
   - Each state is learned **separately**
   - Takes a long time to learn
@@ -196,9 +198,11 @@ RL in CS188 ----|                 ---- Passive RL  -------|
   - Policy is still fixed.
   - It computes the **running average** of $V(s)$, which moves the current value of the state towards the sampled value.
 
-$$\text{Sample of } V(s): \hspace*{1em} \text{sample} = R(s, \pi(s), s') + \gamma V^\pi(s') \\ \ \\
-  \text{Update to } V(s): \hspace{1em}V^\pi(s) \leftarrow (1 - \alpha) V^\pi(s) + \alpha \text{sample} \\  \ \\
-  \text{Rewriting of update} \hspace{1em} V^\pi(s) \leftarrow V^\pi(s) + \alpha(\text{sample} - V^\pi(s)) $$
+$$\text{Sample of } V(s): \ \ \ \text{sample} = R(s, \pi(s), s') + \gamma V^\pi(s')$$
+
+$$\text{Update to } V(s): \ \ \ V^\pi(s) \leftarrow (1 - \alpha) V^\pi(s) + \alpha \text{sample}$$
+
+$$\text{Rewriting of update} \ \ \  V^\pi(s) \leftarrow V^\pi(s) + \alpha(\text{sample} - V^\pi(s))$$
 
 - Even of original estimate of $V(s)$, due to the properties of running average, it will not matter as you get more samples.
 - <u>**Decreasing learning rate**</u> $\alpha$ can give converging averages.

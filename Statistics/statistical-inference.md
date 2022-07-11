@@ -56,7 +56,7 @@ The likelihood describes the extent to which the sample provides support for any
 
 ### **<u>Likelihood function</u>**
 
-- For a given sample, you can create likelihoods for **all the possible values of ** $\theta$, this is called a **likelihood function**.
+- For a given sample, you can create likelihoods for **all the possible values of** $\theta$, this is called a **likelihood function**.
   $$
   L(\theta) = L(\theta;y)=f_y(y;\theta)
   $$
@@ -113,15 +113,14 @@ The likelihood describes the extent to which the sample provides support for any
 Systolic blood pressure in pregnancy. where we know before hand that it is a normal distribution with $\sigma^2 = 100$ 
 
 - Sample: $\{135, 123, 120, 102,110 \}$
-  $$
-  L(\mu)=\prod_{i=1}^5f_i(y_i;\mu)\\
+
+  $$L(\mu)=\prod_{i=1}^5f_i(y_i;\mu)\\
   =\prod_{i=1}^5\frac{1}{\sqrt{200\pi}}e^{-\frac{(y_i - \mu)^2}{200}} \\
   =(\frac{1}{200\pi})^\frac{5}2 e^{-\sum^5_{i=1}\frac{(y_i-\mu)^2}{200}} \\
-  =
-  (\frac{1}{200\pi})^\frac{5}2
+  = (\frac{1}{200\pi})^\frac{5}2
   exp\{{-\sum^5_{i=1}\frac{y_i^2}{200}}\} 
   exp\{{(\frac{\mu (\Sigma y_i) }{100}) - \frac{5 \mu^2}{200}}\}
-  $$
+$$
   We can now replace $\Sigma y$ with $T(y)$ and then it is a **sufficient statistic**.
 
 - What this means is that we don't need to know the values of the systolic pressure, we just need to know their sum and that will allow us to get the likelihood function for $\mu$
@@ -188,7 +187,7 @@ Systolic blood pressure in pregnancy. where we know before hand that it is a nor
 
 - The **score equation** is 
   $$
-  \dv{\theta} \ell(\theta) = 0
+  \frac{d}{d{\theta}} \ell(\theta) = 0
   $$
 
 ****

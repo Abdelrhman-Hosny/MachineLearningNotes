@@ -1,5 +1,7 @@
 [toc]
 
+<div style='page-break-after: always;'></div>
+
 # <u>**Reinforcement Learning - II**</u>
 
 ## <u>**Q-Learning (Revision)**</u>
@@ -167,4 +169,5 @@ $$Q(s,a) = w_1 f_1(s,a) + w_2 f_2(s,a) + ... + w_n f_n(s,a)$$
 - The softmax gives a **differentiable function** of $\theta$, hence the value of the policy $\rho(\theta)$ is a diffentiable function of $\theta$.
 
 $$\pi_0(s,a) = \frac{\exp{\hat Q_\theta(s,a)}}{\sum_{a'} \exp{\hat Q_\theta (s,a')}}$$
+
 ****
