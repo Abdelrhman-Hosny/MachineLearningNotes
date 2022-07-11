@@ -207,7 +207,7 @@ Check the notes from probability course
   - If we take the derivate w.r.t $\beta$
     $$
     -\frac{1}2 \sum^N_{n=1}(y(x_n,\bf w_{ML}) - t_n)^2 + \frac{N}{2\beta_{ML}}= 0 \\
-    \frac{1}{\beta_{ML}}= \frac{1}N \sum^N_{n=1}(y(x_n,\bf w_{ML}) - t_n)^2 
+    \frac{1}{\beta_{ML}}= \frac{1}N \sum^N_{n=1}(y(x_n,\bf w_{ML}) - t_n)^2
     $$
     **N.B.** we first had to get $\bf w_{ML}$ as it is used in the calculation of $\beta_{ML}$
 
@@ -215,6 +215,8 @@ Check the notes from probability course
   $$
   p(t|x, \bf w_{ML} , \beta_{ML} ) = \mathcal{N}(t|y(x, w_{ML} ), \beta_{ML}^{−1})
   $$
+  
+- 
 
 ****
 
