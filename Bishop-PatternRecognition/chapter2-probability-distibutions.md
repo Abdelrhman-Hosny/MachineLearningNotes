@@ -89,6 +89,8 @@
   \\
   var[m] = N\mu (1-\mu)
   $$
+  
+- 
 
 ****
 
@@ -143,7 +145,7 @@
 #### **<u>More Intuition</u>**
 
 - Lets assume that we start with a prior of $\text{Beta}(\mu|a,b)$, we don't know $\mu$ but we have a rough estimate for it that we modeled through the beta distributions.
-- After seeing what happens, we can update the distribution to be $\text{Beta}(\mu|a+\text{# success}, b +\text{# failure})$.
+- After seeing what happens, we can update the distribution to be $\text{Beta}(\mu|a+\text{num success}, b +\text{num failure})$.
 - If we imagine a coin, we assume (head = success). the prior distribution would be centered around 0.5 with small-ish variance.
   - If we flip the coin 6 times, and all 6 times are heads. it makes it more likely that $\mu > 0.5$
   - By making $a := a +6$, we shift the distribution to the right, just like the figure above.
@@ -166,7 +168,7 @@
   $$
   p(x=1|\mathcal{D}) = \int_0^1 p(x = 1| \mu)p(\mu|\mathcal{D}) d\mu
   = \int_0^1 \mu p(\mu|\mathcal{D})d\mu = E[\mu|\mathcal{D}] \\
-  E[\mu|\mathcal{D}] = \frac{m + a}{m+a+l+b} = \frac{\text{# success} + \text{initial estimate for successes}}{\text{total # of old tries + total # of new observations}}
+  E[\mu|\mathcal{D}] = \frac{m + a}{m+a+l+b} = \frac{\text{num success} + \text{initial estimate for successes}}{\text{total num of old tries + total num of new observations}}
   $$
   initial estimates are **fictitious prior observations**, these are the numbers from our estimate of the prior distribution.
 
@@ -216,6 +218,8 @@
     $$
     \mu_{k}^{ML}= \frac{m_k}N
     $$
+  
+- 
 
 
 ****
