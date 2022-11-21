@@ -30,6 +30,9 @@
 
 - There might be a pattern in the data even if your model can't capture it.
 
+#### Existing Data
+
+- We have to make sure there is enough data, or atleast **a way to collect data**.
 ### Good characteristics for ML Projects
 
 - Due to the way most ML algorithms learn, ML will shine if you have the following characteristics.
@@ -43,6 +46,9 @@
 - Since ML is expensive (team and computation wise), it's better if the model will make a lot of predictions.
 
 #### Changing Patterns
+
+- If the patterns don't change (vary) a hardcoded solution would be sufficient, without the need for ML.
+
 
 ----------
 
@@ -124,5 +130,12 @@
 - In production, once the model is deployed, the job is to do inference.
   - So inference is the bottleneck in this case.
 
+----------
 
+#### Bias
+
+"ML models don't predict the future, they encode the past".
+- This refers to the bias in the model due to the data it was trained on.
+
+----------
 
