@@ -13,7 +13,7 @@ Here's the link to the original paper: [Attention is all you need](https://arxiv
     Uses the **encoder's hidden state** to **iteratively** generate an output **sequence of tokens**.
 
     ![alt](./images/transformer-architecture.png)
-- Notice that the Encoder and the Decoder containt **Encoder Stacks** and **Decoder Stacks**.
+- Notice that the Encoder and the Decoder contain **Encoder Stacks** and **Decoder Stacks**.
 - While transformers were originally made for sequence to sequence tasks, people **separated** the **encoder and decorder** and used them individually for different tasks.
   - **Encoder-only**
   These models convert a sequence of tokens into a sequence of embeddings.
@@ -150,6 +150,7 @@ Here's the link to the original paper: [Attention is all you need](https://arxiv
 
 - A study fllowing the release of BERT revealed that **performance** can be **improved** by **modifying the pretraining scheme**.
 - RoBERTa is **trained longer**, on **larger batches w/ more training data**, it also **drops the NSP task**.
+- Even if you have the same memory, you can do **gradient accumulation**.
 - These changes improved the performance significantly **compared to the original BERT model**.
 
 ****
@@ -171,3 +172,26 @@ Here's the link to the original paper: [Attention is all you need](https://arxiv
   3. NSP objective is **replaced** with **sentence-ordering prediction**.
      - Predict **whether or not** the **order**  of **two** sentences was **swapped**. (instead of if they belong together at all)
 - These changes made it possible to **train even larger models w/ fewer parameters** and reach a good performance.
+
+****
+### **<u>ELECTRA</u>**
+
+- Addresses a weakness of MLM
+  - At each training step, only the representations of the masked tokens are updated.
+- ELECTRA swaps out a word from the sentence with a **random word** and **predicts** if the **original word** was **replaced** or not.
+  - This way, the **entire sentence** is **updated** at each training step.
+ This method makes training more effective.
+
+****
+### **<u>DeBERTa</u>**
+
+- Introduces **two** architectural changes.
+  1. Each token is represented as two vectors. $v_1$ is the content vector and $v_2$ is the relative position vector. 
+  This allows for better modelling of the dependencies between tokens.
+  2. Adds Absolute position embedding before the softmax later of the token decoding head.
+
+----------
+
+## **<u>The Decoder Branch</u>**
+
+
