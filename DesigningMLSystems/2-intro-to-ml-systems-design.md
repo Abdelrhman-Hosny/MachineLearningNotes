@@ -62,7 +62,7 @@
 ![alt](./images/ch2/devel-proc-ml-sys.png)
 
 1. Project Scoping
-    - Set up goals and objective and constrants
+    - Set up goals and objective and constraints
     - This phase involves stakeholders
     - Estimate and allocate resources
     - Structure and organize teams for the project
