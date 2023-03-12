@@ -83,6 +83,8 @@
    - $S^a_t$ is the **agent state**.
    - The agent state $S_t^a$ is the agent's **internal representation**
      - i.e. whatever info the agent uses to pick the next action
+    - $S^a_t$ can be any function of history
+      - $S^a_t = f(H_t)$
 
    ****
 
@@ -129,7 +131,7 @@
 
   - A poker playing agent only observes "public" cards
 
-- Now agent state $\neq$ environment state
+- Now, agent state $\neq$ environment state
 
 - Formally: this is know as a **partially observable MDP** (POMDP)
 
@@ -138,6 +140,7 @@
 - There are several approaches for building your own representations like
 
   - **Complete History**
+    Naive Approach - Just remember everything.
     $$
     S_t^a = H_t
     $$
@@ -179,6 +182,10 @@
     \pi(a|s) = P(A=a|S=s)
     $$
     The probability of taking an action based on some state.
+
+    Helps us when making random decisions for exploration.
+
+- Our goal is to learn the optimal policy in order to collect the most reward.
 
 ****
 
